@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact name="MobStacker:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/MobStacker_jar</output-path>
+    <root id="root">
+      <element id="archive" name="MobStacker.jar">
+        <element id="module-output" name="MobStacker" />
+      </element>
+      <element id="library" level="application" name="spigot-1.8.7" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,93 @@
+# The naming layout for stacked mobs. Use the {QTY} and {TYPE} tags, along with normal colour codes to customise the in game display.
+stack-naming: '&e&l{QTY}X &6&l{TYPE}'
+
+# How far around the mob should the plugin check for mobs to stack to?
+stack-range:
+    x: 5
+    y: 2
+    z: 5
+
+# How many seconds after a mob spawns should the plugin check for mobs to stack to?
+# The higher the number, the more work for the server to do. Keep this rather low. In SECONDS NOT TICKS.
+# Set to 0 to only try stack on spawn. Set to -1 to never stop trying to stack (Possibly lag inducive for larger number of mobs (1000+).
+seconds-to-try-stack: 5
+
+# If false, named mobs will not stack, meaning pets are protected.
+stack-custom-named-mobs: false
+
+# If false mobs will stack regardless of age (Baby or adult)
+stack-by-age: true
+
+# False means that animals on a leash will not stack.
+stack-leashed-aminals: false
+
+# Protect tamed animals from being stacked on?
+protect-tamed: true
+
+# If a stack of mobs fall off should the full stack die, or just one mob in the stack?
+kill-whole-stack-on-fall-death: true
+
+# If a creeper stack explodes, should the whole stack die?
+exploding-creeper-kills-stack: false
+
+# Should a creepers explosion be made larger if the full stack explodes? exploding-creeper-kills-stack: must be true for this to work.
+magnify-stack-explosion:
+    enable: true
+    max-creeper-explosion-size: 10
+
+# Mobs marked with true WILL attempt to stack. Mobs spawned by building (Golems and Wither) are a bit buggy, so it is suggested to leave them false.
+stack-mob-type:
+    BAT: true
+    BLAZE: true
+    CAVE_SPIDER: true
+    CHICKEN: true
+    COW: true
+    CREEPER: true
+    ENDERMAN: true
+    ENDERMITE: true
+    GHAST: true
+    GIANT: true
+    GUARDIAN: true
+    HORSE: true
+    IRON_GOLEM: false
+    MAGMA_CUBE: true
+    MUSHROOM_COW: true
+    OCELOT: true
+    PIG: true
+    PIG_ZOMBIE: true
+    RABBIT: true
+    SHEEP: true
+    SILVERFISH: true
+    SKELETON: true
+    SLIME: true
+    SNOWMAN: false
+    SPIDER: true
+    SQUID: true
+    VILLAGER: true
+    WITCH: true
+    WITHER: false
+    WOLF: true
+    ZOMBIE: true
+
+# Spawn methods marked with true WILL attempt to stack. CUSTOM is mobs spawned by plugins - Including this one. Certain features require CUSTOM to be left true.
+# Plugin will still work if CUSTOM is set to false, jut not collecting stacks when another stack is killed nearby.
+# It is suggested to leave SLIME_SPLIT false due to duplication issues.
+stack-spawn-method:
+    SPAWNER_EGG: true
+    SPAWNER: true
+    BREEDING: false
+    BUILD_IRONGOLEM: false
+    BUILD_SNOWMAN: false
+    BUILD_WITHER: false
+    CHUNK_GEN: false
+    CURED: false
+    CUSTOM: true
+    DISPENSE_EGG: true
+    EGG: true
+    INFECTION: false
+    JOCKEY: false
+    LIGHTNING: false
+    MOUNT: false
+    NATURAL: false
+    OCELOT_BABY: false
+    SLIME_SPLIT: false
