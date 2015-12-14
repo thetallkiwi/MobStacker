@@ -38,9 +38,9 @@ public class MobDeathListener implements Listener {
                     for (Entity nearbyEntity : nearbyEntities) {
 
                         if (nearbyEntity.getType() == entity.getType() && !entity.isDead() &&
-                                (stackLeashed || stackLeashed == ((LivingEntity) nearbyEntity).isLeashed()) &&
+                                (stackLeashed || !((LivingEntity) nearbyEntity).isLeashed()) &&
                                 (!stackByAge || !(entity instanceof Ageable) || (((Ageable) entity).isAdult() == ((Ageable) nearbyEntity).isAdult())) &&
-                                (!protectTamed || !(nearbyEntity instanceof Tameable)  || (nearbyEntity instanceof Tameable && !((Tameable) nearbyEntity).isTamed() && !((Tameable) nearbyEntity).isTamed()))) {
+                                (!protectTamed || !(nearbyEntity instanceof Tameable)  || !((Tameable) nearbyEntity).isTamed() && !((Tameable) nearbyEntity).isTamed())) {
 
                             nearbyEntity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, entity.getMetadata("quantity").get(0).asInt() - 1 + nearbyEntity.getMetadata("quantity").get(0).asInt()));
 

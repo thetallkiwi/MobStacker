@@ -1,9 +1,7 @@
 package com.kiwifisher.mobstacker;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Ageable;
-import org.bukkit.entity.Explosive;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

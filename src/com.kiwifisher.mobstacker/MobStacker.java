@@ -1,12 +1,10 @@
 package com.kiwifisher.mobstacker;
 
 import com.google.common.io.ByteStreams;
-import org.apache.commons.io.FileUtils;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mcstats.Metrics;
 import java.io.*;
-import java.net.URL;
 
 public class MobStacker extends JavaPlugin {
 
@@ -52,7 +50,7 @@ public class MobStacker extends JavaPlugin {
         log("Thanks for using MobStacker!");
 
     }
-
+    
     public static File loadResource(Plugin plugin, String resource) {
         File folder = plugin.getDataFolder();
         if (!folder.exists())

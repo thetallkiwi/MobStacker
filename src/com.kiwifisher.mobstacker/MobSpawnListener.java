@@ -20,8 +20,18 @@ public class MobSpawnListener implements Listener {
             LivingEntity spawnedCreature = event.getEntity();
             CreatureSpawnEvent.SpawnReason spawnReason = event.getSpawnReason();
 
+            boolean entityIsArmorStand = false;
+
+            if (Bukkit.getVersion().contains("1.7")) {
+                entityIsArmorStand = false;
+            } else if (spawnedCreature.getType() == EntityType.ARMOR_STAND) {
+                entityIsArmorStand = true;
+            }
+            
+
+
             if (MobStacker.plugin.getConfig().getBoolean("stack-mob-type." + spawnedCreature.getType().toString())
-                    && MobStacker.plugin.getConfig().getBoolean("stack-spawn-method." + spawnReason) && spawnedCreature.getType() != EntityType.ARMOR_STAND) {
+                    && MobStacker.plugin.getConfig().getBoolean("stack-spawn-method." + spawnReason) && !entityIsArmorStand) {
 
                 spawnedCreature.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, 1));
 
@@ -117,7 +127,7 @@ public class MobSpawnListener implements Listener {
 
     if (newEntity.getType() == existingEntity.getType() && MobStacker.plugin.getConfig().getBoolean("stack-mob-type." + newEntity.getType().toString())
                 && MobStacker.plugin.getConfig().getBoolean("stack-spawn-method." + newEntitySpawnReason) &&
-                existingEntity.getType() != EntityType.ARMOR_STAND && existingEntity.hasMetadata("quantity") && !existingEntity.isDead()) {
+                existingEntity.hasMetadata("quantity") && !existingEntity.isDead()) {
 
             int newQuantity;
 
