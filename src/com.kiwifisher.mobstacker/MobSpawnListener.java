@@ -115,23 +115,31 @@ public class MobSpawnListener implements Listener {
 
     private void stackEntities(LivingEntity existingEntity, LivingEntity newEntity, CreatureSpawnEvent.SpawnReason newEntitySpawnReason) {
 
-        if (newEntity.getType() == existingEntity.getType() && MobStacker.plugin.getConfig().getBoolean("stack-mob-type." + newEntity.getType().toString())
-                && MobStacker.plugin.getConfig().getBoolean("stack-spawn-method." + newEntitySpawnReason) && existingEntity.getType() != EntityType.ARMOR_STAND && existingEntity.hasMetadata("quantity") && !existingEntity.isDead()) {
+    if (newEntity.getType() == existingEntity.getType() && MobStacker.plugin.getConfig().getBoolean("stack-mob-type." + newEntity.getType().toString())
+                && MobStacker.plugin.getConfig().getBoolean("stack-spawn-method." + newEntitySpawnReason) &&
+                existingEntity.getType() != EntityType.ARMOR_STAND && existingEntity.hasMetadata("quantity") && !existingEntity.isDead()) {
 
             int newQuantity;
 
-            int stackedEntityQuantity = existingEntity.getMetadata("quantity").get(0).asInt();
-            newQuantity = stackedEntityQuantity + newEntity.getMetadata("quantity").get(0).asInt();
+            if (existingEntity.getLocation().getBlockY() >= newEntity.getLocation().getBlockY() && MobStacker.plugin.getConfig().getBoolean("stack-mobs-down")) {
+                stackEntities(newEntity, existingEntity, newEntitySpawnReason);
 
-            existingEntity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, newQuantity));
-            String configNaming = MobStacker.plugin.getConfig().getString("stack-naming");
-            configNaming = configNaming.replace("{QTY}", newQuantity + "");
-            configNaming = configNaming.replace("{TYPE}", existingEntity.getType().toString().replace("_", " "));
-            configNaming = ChatColor.translateAlternateColorCodes('&', configNaming);
-            existingEntity.setCustomName(configNaming);
-            existingEntity.setCustomNameVisible(true);
+            } else {
 
-            newEntity.remove();
+                int stackedEntityQuantity = existingEntity.getMetadata("quantity").get(0).asInt();
+                newQuantity = stackedEntityQuantity + newEntity.getMetadata("quantity").get(0).asInt();
+
+                existingEntity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, newQuantity));
+                String configNaming = MobStacker.plugin.getConfig().getString("stack-naming");
+                configNaming = configNaming.replace("{QTY}", newQuantity + "");
+                configNaming = configNaming.replace("{TYPE}", existingEntity.getType().toString().replace("_", " "));
+                configNaming = ChatColor.translateAlternateColorCodes('&', configNaming);
+                existingEntity.setCustomName(configNaming);
+                existingEntity.setCustomNameVisible(true);
+
+                newEntity.remove();
+            }
+
         }
 
     }
