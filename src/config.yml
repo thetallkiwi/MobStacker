@@ -35,8 +35,12 @@ magnify-stack-explosion:
     enable: true
     max-creeper-explosion-size: 10
 
-# Should mobs always stack towards the ground? Useful for flying mobs, like blazes.
-stack-mobs-down: true
+# Should mobs always stack towards the ground? Useful for flying mobs, like blazes and ghasts.
+stack-mobs-down:
+    enable: true
+    mob-types:
+        - BLAZE
+        - GHAST
 
 # Mobs marked with true WILL attempt to stack. Mobs spawned by building (Golems and Wither) are a bit buggy, so it is suggested to leave them false.
 stack-mob-type:

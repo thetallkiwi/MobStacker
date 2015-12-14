@@ -55,7 +55,7 @@ public class MobSpawnListener implements Listener {
                         if (nearbyEntity.getType() == entity.getType() && !entity.isDead() &&
                                 (stackLeashed || stackLeashed == ((LivingEntity) nearbyEntity).isLeashed()) &&
                                 (!stackByAge || !(entity instanceof Ageable) || (((Ageable) entity).isAdult() == ((Ageable) nearbyEntity).isAdult())) &&
-                                (!protectTamed || !(nearbyEntity instanceof Tameable) || (nearbyEntity instanceof Tameable && !((Tameable) nearbyEntity).isTamed() && !((Tameable) entity).isTamed()))) {
+                                (!protectTamed || !(nearbyEntity instanceof Tameable) || (!((Tameable) nearbyEntity).isTamed() && !((Tameable) entity).isTamed()))) {
 
                             stackEntities((LivingEntity) nearbyEntity, entity, spawnReason);
                             cancel();
@@ -73,7 +73,7 @@ public class MobSpawnListener implements Listener {
                         if (nearbyEntity.getType() == entity.getType() && !entity.isDead() &&
                                 (stackLeashed || stackLeashed == ((LivingEntity) nearbyEntity).isLeashed()) &&
                                 (!stackByAge || !(entity instanceof Ageable) || (((Ageable) entity).isAdult() == ((Ageable) nearbyEntity).isAdult())) &&
-                                (!protectTamed || !(nearbyEntity instanceof Tameable)  || (nearbyEntity instanceof Tameable && !((Tameable) nearbyEntity).isTamed() && !((Tameable) entity).isTamed()))) {
+                                (!protectTamed || !(nearbyEntity instanceof Tameable)  || (!((Tameable) nearbyEntity).isTamed() && !((Tameable) entity).isTamed()))) {
 
                             stackEntities((LivingEntity) nearbyEntity, entity, spawnReason);
                             cancel();
@@ -93,7 +93,7 @@ public class MobSpawnListener implements Listener {
                             if (nearbyEntity.getType() == entity.getType() && !entity.isDead() &&
                                     (stackLeashed || stackLeashed == ((LivingEntity) nearbyEntity).isLeashed()) &&
                                     (!stackByAge || !(entity instanceof Ageable) || (((Ageable) entity).isAdult() == ((Ageable) nearbyEntity).isAdult())) &&
-                                    (!protectTamed || !(nearbyEntity instanceof Tameable)  || (nearbyEntity instanceof Tameable && !((Tameable) nearbyEntity).isTamed() && !((Tameable) nearbyEntity).isTamed()))) {
+                                    (!protectTamed || !(nearbyEntity instanceof Tameable)  || (!((Tameable) nearbyEntity).isTamed() && !((Tameable) nearbyEntity).isTamed()))) {
 
                                 stackEntities((LivingEntity) nearbyEntity, entity, spawnReason);
                                 cancel();
@@ -121,7 +121,8 @@ public class MobSpawnListener implements Listener {
 
             int newQuantity;
 
-            if (existingEntity.getLocation().getBlockY() >= newEntity.getLocation().getBlockY() && MobStacker.plugin.getConfig().getBoolean("stack-mobs-down")) {
+            if (existingEntity.getLocation().getBlockY() > newEntity.getLocation().getBlockY() && MobStacker.plugin.getConfig().getBoolean("stack-mobs-down.enable") &&
+                    MobStacker.plugin.getConfig().getList("stack-mobs-down.mob-types").contains(newEntity.getType().toString())) {
                 stackEntities(newEntity, existingEntity, newEntitySpawnReason);
 
             } else {
