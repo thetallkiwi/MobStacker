@@ -42,6 +42,9 @@ stack-mobs-down:
         - BLAZE
         - GHAST
 
+# Should coloured mobs, like sheep, be stacked separately?
+separate-stacks-by-color: true
+
 # Mobs marked with true WILL attempt to stack. Mobs spawned by building (Golems and Wither) are a bit buggy, so it is suggested to leave them false.
 stack-mob-type:
     BAT: true

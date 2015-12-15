@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.material.Colorable;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class MobDeathListener implements Listener {
     boolean stackByAge = MobStacker.plugin.getConfig().getBoolean("stack-by-age");
     boolean stackLeashed = MobStacker.plugin.getConfig().getBoolean("stack-leashed-mobs");
     boolean protectTamed = MobStacker.plugin.getConfig().getBoolean("protect-tamed");
+    boolean separateColour = MobStacker.plugin.getConfig().getBoolean("separate-stacks-by-color");
 
 
 
@@ -40,7 +42,8 @@ public class MobDeathListener implements Listener {
                         if (nearbyEntity.getType() == entity.getType() && !entity.isDead() &&
                                 (stackLeashed || !((LivingEntity) nearbyEntity).isLeashed()) &&
                                 (!stackByAge || !(entity instanceof Ageable) || (((Ageable) entity).isAdult() == ((Ageable) nearbyEntity).isAdult())) &&
-                                (!protectTamed || !(nearbyEntity instanceof Tameable)  || !((Tameable) nearbyEntity).isTamed() && !((Tameable) nearbyEntity).isTamed())) {
+                                (!protectTamed || !(nearbyEntity instanceof Tameable)  || !((Tameable) nearbyEntity).isTamed() && !((Tameable) nearbyEntity).isTamed()) &&
+                                (!separateColour || !(nearbyEntity instanceof Colorable) || (((Colorable) nearbyEntity).getColor() != ((Colorable) entity).getColor()))) {
 
                             nearbyEntity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, entity.getMetadata("quantity").get(0).asInt() - 1 + nearbyEntity.getMetadata("quantity").get(0).asInt()));
 
@@ -69,6 +72,10 @@ public class MobDeathListener implements Listener {
 
                     if (newEntity instanceof Ageable) {
                         ((Ageable) newEntity).setAge(((Ageable) event.getEntity()).getAge());
+                    }
+
+                    if (newEntity instanceof Colorable) {
+                        ((Colorable) newEntity).setColor(((Colorable) event.getEntity()).getColor());
                     }
 
                     newEntity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, newQuantity));

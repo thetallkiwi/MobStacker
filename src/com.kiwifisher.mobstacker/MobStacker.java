@@ -35,7 +35,7 @@ public class MobStacker extends JavaPlugin {
 
         plugin.getServer().getPluginManager().registerEvents(new MobSpawnListener(), this);
         plugin.getServer().getPluginManager().registerEvents(new MobDeathListener(), this);
-        plugin.getServer().getPluginManager().registerEvents(new CustomNamingListener(), this);
+        plugin.getServer().getPluginManager().registerEvents(new PlayerEntityInteractListener(), this);
         plugin.getServer().getPluginManager().registerEvents(new EntityTameListener(), this);
         plugin.getServer().getPluginManager().registerEvents(new EntityExplodeListener(), this);
         getCommand("mobstacker").setExecutor(new MobStackerCommands());
@@ -50,7 +50,7 @@ public class MobStacker extends JavaPlugin {
         log("Thanks for using MobStacker!");
 
     }
-    
+
     public static File loadResource(Plugin plugin, String resource) {
         File folder = plugin.getDataFolder();
         if (!folder.exists())

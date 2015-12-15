@@ -8,7 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-public class EntityTameListener implements Listener {
+public class EntityTameListener extends StackUtils implements Listener {
 
     @EventHandler
     public void onEntityTameEvent(EntityTameEvent event) {
@@ -23,22 +23,10 @@ public class EntityTameListener implements Listener {
 
             if (newQuantity > 0) {
 
-                LivingEntity newEntity = (LivingEntity) entity.getLocation().getWorld().spawnEntity(entity.getLocation(), entity.getType());
+                LivingEntity newEntity = peelOff(entity, false);
 
                 if (newEntity instanceof Ageable) {
                     ((Ageable) newEntity).setAge(((Ageable) event.getEntity()).getAge());
-                }
-
-                newEntity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, newQuantity));
-
-                if (newQuantity > 1) {
-
-                    String configNaming = MobStacker.plugin.getConfig().getString("stack-naming");
-                    configNaming = configNaming.replace("{QTY}", newQuantity + "");
-                    configNaming = configNaming.replace("{TYPE}", entity.getType().toString().replace("_", " "));
-                    configNaming = ChatColor.translateAlternateColorCodes('&', configNaming);
-                    newEntity.setCustomName(configNaming);
-
                 }
 
             }
