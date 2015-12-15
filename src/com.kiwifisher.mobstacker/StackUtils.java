@@ -28,12 +28,14 @@ public class StackUtils {
 
                     List<Entity> nearbyEntities = entity.getNearbyEntities(MobStacker.plugin.getConfig().getInt("stack-range.x"), MobStacker.plugin.getConfig().getInt("stack-range.y"), MobStacker.plugin.getConfig().getInt("stack-range.z"));
 
-                    for (Entity nearbyEntity : nearbyEntities) {
+                    if (nearbyEntities.size() > 0) {
+                        for (Entity nearbyEntity : nearbyEntities) {
 
-                        if (nearbyEntity instanceof LivingEntity && stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
-                            count = limit + 1;
-                            cancel();
-                            break;
+                            if (nearbyEntity instanceof LivingEntity && !nearbyEntity.isDead() && stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
+                                count = limit + 1;
+                                cancel();
+                                break;
+                            }
                         }
                     }
 
@@ -43,7 +45,7 @@ public class StackUtils {
 
                     for (Entity nearbyEntity : nearbyEntities) {
 
-                        if (nearbyEntity instanceof LivingEntity && stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
+                        if (nearbyEntity instanceof LivingEntity && !nearbyEntity.isDead() && stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
                             cancel();
                             break;
                         }
@@ -58,7 +60,7 @@ public class StackUtils {
 
                         for (Entity nearbyEntity : nearbyEntities) {
 
-                            if (nearbyEntity instanceof LivingEntity &&  stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
+                            if (nearbyEntity instanceof LivingEntity && !nearbyEntity.isDead() &&  stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
                                 cancel();
                                 break;
                             }
@@ -95,7 +97,7 @@ public class StackUtils {
                     MobStacker.plugin.getConfig().getList("stack-mobs-down.mob-types").contains(newEntity.getType().toString())) {
                 stackEntities(newEntity, existingEntity, newEntitySpawnReason);
 
-            } else if (newEntity.getType() == existingEntity.getType() && !existingEntity.isDead() &&
+            } else if (newEntity.getType() == existingEntity.getType() && !existingEntity.isDead() && newEntity.hasMetadata("quantity") &&
                     (stackLeashed || !existingEntity.isLeashed() && !newEntity.isLeashed()) &&
                     (!stackByAge || !(newEntity instanceof Ageable) || (((Ageable) newEntity).isAdult() == ((Ageable) existingEntity).isAdult())) &&
                     (!protectTamed || !(newEntity instanceof Tameable) || (!((Tameable) newEntity).isTamed() && !((Tameable) existingEntity).isTamed())) &&

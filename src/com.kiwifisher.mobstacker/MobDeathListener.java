@@ -1,5 +1,6 @@
 package com.kiwifisher.mobstacker;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -39,7 +40,7 @@ public class MobDeathListener implements Listener {
 
                     for (Entity nearbyEntity : nearbyEntities) {
 
-                        if (nearbyEntity.getType() == entity.getType() && !entity.isDead() &&
+                        if (nearbyEntity.getType() == entity.getType() && entity.isDead() && !nearbyEntity.isDead() &&
                                 (stackLeashed || !((LivingEntity) nearbyEntity).isLeashed()) &&
                                 (!stackByAge || !(entity instanceof Ageable) || (((Ageable) entity).isAdult() == ((Ageable) nearbyEntity).isAdult())) &&
                                 (!protectTamed || !(nearbyEntity instanceof Tameable)  || !((Tameable) nearbyEntity).isTamed() && !((Tameable) nearbyEntity).isTamed()) &&
@@ -68,8 +69,9 @@ public class MobDeathListener implements Listener {
 
                 if (newQuantity > 0) {
 
+                    entity.removeMetadata("quantity", MobStacker.plugin);
                     LivingEntity newEntity = (LivingEntity) entity.getLocation().getWorld().spawnEntity(entityLocation, entityType);
-
+                    
                     if (newEntity instanceof Ageable) {
                         ((Ageable) newEntity).setAge(((Ageable) event.getEntity()).getAge());
                     }

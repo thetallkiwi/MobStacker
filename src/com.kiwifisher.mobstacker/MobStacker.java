@@ -1,6 +1,9 @@
 package com.kiwifisher.mobstacker;
 
 import com.google.common.io.ByteStreams;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mcstats.Metrics;
@@ -46,6 +49,15 @@ public class MobStacker extends JavaPlugin {
 
     @Override
     public void onDisable() {
+
+        for (World world : getServer().getWorlds()) {
+            for (LivingEntity entity : world.getLivingEntities()) {
+                if (entity.hasMetadata("quantity")) {
+                    entity.removeMetadata("quantity", plugin);
+                    entity.setCustomName("");
+                }
+            }
+        }
 
         log("Thanks for using MobStacker!");
 
