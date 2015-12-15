@@ -6,9 +6,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTameEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 
-public class EntityTameListener extends StackUtils implements Listener {
+public class EntityTameListener implements Listener {
 
     @EventHandler
     public void onEntityTameEvent(EntityTameEvent event) {
@@ -23,7 +22,7 @@ public class EntityTameListener extends StackUtils implements Listener {
 
             if (newQuantity > 0) {
 
-                LivingEntity newEntity = peelOff(entity, false);
+                LivingEntity newEntity = StackUtils.peelOff(entity, false);
 
                 if (newEntity instanceof Ageable) {
                     ((Ageable) newEntity).setAge(((Ageable) event.getEntity()).getAge());

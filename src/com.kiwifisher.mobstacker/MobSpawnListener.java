@@ -7,7 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-public class MobSpawnListener extends StackUtils implements Listener {
+public class MobSpawnListener implements Listener {
 
     private static int searchTime = MobStacker.plugin.getConfig().getInt("seconds-to-try-stack") * 20;
 
@@ -18,11 +18,6 @@ public class MobSpawnListener extends StackUtils implements Listener {
     public static void setSearchTime(int searchTime) {
         MobSpawnListener.searchTime = searchTime;
     }
-
-    public static void resetSearchTime() {
-        setSearchTime(getSearchTime());
-    }
-
 
     @EventHandler
     public void mobSpawnEvent(CreatureSpawnEvent event) {
@@ -45,7 +40,7 @@ public class MobSpawnListener extends StackUtils implements Listener {
 
                 spawnedCreature.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, 1));
 
-                attemptToStack(getSearchTime(), spawnedCreature, spawnReason);
+                StackUtils.attemptToStack(getSearchTime(), spawnedCreature, spawnReason);
 
             }
         }

@@ -1,6 +1,5 @@
 package com.kiwifisher.mobstacker;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -8,12 +7,11 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.material.Colorable;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
-
 import java.util.List;
 
-public abstract class StackUtils {
+public class StackUtils {
 
-    public void attemptToStack(final int searchTime, final LivingEntity entity, final CreatureSpawnEvent.SpawnReason spawnReason) {
+    public static void attemptToStack(final int searchTime, final LivingEntity entity, final CreatureSpawnEvent.SpawnReason spawnReason) {
 
         new BukkitRunnable() {
 
@@ -32,7 +30,7 @@ public abstract class StackUtils {
 
                     for (Entity nearbyEntity : nearbyEntities) {
 
-                        if (stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
+                        if (nearbyEntity instanceof LivingEntity && stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
                             count = limit + 1;
                             cancel();
                             break;
@@ -45,7 +43,7 @@ public abstract class StackUtils {
 
                     for (Entity nearbyEntity : nearbyEntities) {
 
-                        if (stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
+                        if (nearbyEntity instanceof LivingEntity && stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
                             cancel();
                             break;
                         }
@@ -60,7 +58,7 @@ public abstract class StackUtils {
 
                         for (Entity nearbyEntity : nearbyEntities) {
 
-                            if (stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
+                            if (nearbyEntity instanceof LivingEntity &&  stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
                                 cancel();
                                 break;
                             }
@@ -80,7 +78,7 @@ public abstract class StackUtils {
     }
 
 
-    public boolean stackEntities(LivingEntity existingEntity, LivingEntity newEntity, CreatureSpawnEvent.SpawnReason newEntitySpawnReason) {
+    public static boolean stackEntities(LivingEntity existingEntity, LivingEntity newEntity, CreatureSpawnEvent.SpawnReason newEntitySpawnReason) {
 
         boolean stackByAge = MobStacker.plugin.getConfig().getBoolean("stack-by-age");
         boolean stackLeashed = MobStacker.plugin.getConfig().getBoolean("stack-leashed-mobs");
@@ -127,7 +125,7 @@ public abstract class StackUtils {
 
     }
 
-    public LivingEntity peelOff(Entity mobStack, boolean restackable) {
+    public static LivingEntity peelOff(Entity mobStack, boolean restackable) {
 
         Location location = mobStack.getLocation();
         EntityType type = mobStack.getType();

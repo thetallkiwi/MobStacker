@@ -11,7 +11,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class PlayerEntityInteractListener extends StackUtils implements Listener {
+public class PlayerEntityInteractListener implements Listener {
 
     @EventHandler
     public void interactEvent(PlayerInteractEntityEvent event) {
@@ -24,7 +24,7 @@ public class PlayerEntityInteractListener extends StackUtils implements Listener
 
             if (entity.hasMetadata("quantity") && !itemInHand.getItemMeta().getDisplayName().equalsIgnoreCase(normalNameTag.getItemMeta().getDisplayName())) {
 
-                if (entity.getMetadata("quantity").get(0).asInt() > 1) { peelOff(entity, false); }
+                if (entity.getMetadata("quantity").get(0).asInt() > 1) { StackUtils.peelOff(entity, false); }
 
             }
 
@@ -38,10 +38,10 @@ public class PlayerEntityInteractListener extends StackUtils implements Listener
             if (entity.hasMetadata("quantity")) {
 
                 if (entity.getMetadata("quantity").get(0).asInt() > 1) {
-                    LivingEntity newEntity = peelOff(entity, true);
+                    LivingEntity newEntity = StackUtils.peelOff(entity, true);
 
                 } else {
-                    attemptToStack(0, ((LivingEntity) entity), CreatureSpawnEvent.SpawnReason.CUSTOM);
+                    StackUtils.attemptToStack(0, ((LivingEntity) entity), CreatureSpawnEvent.SpawnReason.CUSTOM);
                 }
 
             }
