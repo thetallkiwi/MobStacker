@@ -1,6 +1,8 @@
 name: MobStacker
 main: com.kiwifisher.mobstacker.MobStacker
 author: KiwiFisher
-version: 1.4
+version: 1.5
+softdepend: [WorldGuard]
 commands:
   mobstacker:
+    permission-message: You don't have access to that command!

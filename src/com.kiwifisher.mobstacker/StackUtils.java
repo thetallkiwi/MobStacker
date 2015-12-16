@@ -152,6 +152,8 @@ public class StackUtils {
             mobStack.setCustomName("");
             mobStack.setCustomNameVisible(true);
         } else {
+            mobStack.setCustomName("");
+            mobStack.setCustomNameVisible(true);
             mobStack.removeMetadata("quantity", MobStacker.plugin);
         }
 

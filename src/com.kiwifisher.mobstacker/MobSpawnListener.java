@@ -1,5 +1,7 @@
 package com.kiwifisher.mobstacker;
 
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -10,17 +12,29 @@ import org.bukkit.metadata.FixedMetadataValue;
 public class MobSpawnListener implements Listener {
 
     private static int searchTime = MobStacker.plugin.getConfig().getInt("seconds-to-try-stack") * 20;
-
     public static int getSearchTime() {
         return searchTime;
     }
-
     public static void setSearchTime(int searchTime) {
         MobSpawnListener.searchTime = searchTime;
     }
+    private static RegionManager regionManager;
 
     @EventHandler
     public void mobSpawnEvent(CreatureSpawnEvent event) {
+
+        if (MobStacker.usesWorldGuard()) {
+
+            regionManager = MobStacker.getWorldGuard().getRegionManager(event.getEntity().getWorld());
+
+            for (ProtectedRegion region : regionManager.getApplicableRegions(event.getEntity().getLocation()).getRegions()) {
+
+                if (!MobStacker.regionAllowedToStack(region.getId())) {
+                    return;
+                }
+            }
+
+        }
 
         if (MobStacker.isStacking()) {
 
@@ -39,6 +53,8 @@ public class MobSpawnListener implements Listener {
                     && MobStacker.plugin.getConfig().getBoolean("stack-spawn-method." + spawnReason) && !entityIsArmorStand && !spawnedCreature.isDead()) {
 
                 spawnedCreature.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, 1));
+
+
 
                 StackUtils.attemptToStack(getSearchTime(), spawnedCreature, spawnReason);
 

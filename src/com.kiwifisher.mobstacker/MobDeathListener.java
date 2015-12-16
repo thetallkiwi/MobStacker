@@ -44,7 +44,8 @@ public class MobDeathListener implements Listener {
                                 (stackLeashed || !((LivingEntity) nearbyEntity).isLeashed()) &&
                                 (!stackByAge || !(entity instanceof Ageable) || (((Ageable) entity).isAdult() == ((Ageable) nearbyEntity).isAdult())) &&
                                 (!protectTamed || !(nearbyEntity instanceof Tameable)  || !((Tameable) nearbyEntity).isTamed() && !((Tameable) nearbyEntity).isTamed()) &&
-                                (!separateColour || !(nearbyEntity instanceof Colorable) || (((Colorable) nearbyEntity).getColor() != ((Colorable) entity).getColor()))) {
+                                (!separateColour || !(nearbyEntity instanceof Colorable) || (((Colorable) nearbyEntity).getColor() != ((Colorable) entity).getColor())) &&
+                                nearbyEntity.hasMetadata("quantity")) {
 
                             nearbyEntity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, entity.getMetadata("quantity").get(0).asInt() - 1 + nearbyEntity.getMetadata("quantity").get(0).asInt()));
 
@@ -71,7 +72,7 @@ public class MobDeathListener implements Listener {
 
                     entity.removeMetadata("quantity", MobStacker.plugin);
                     LivingEntity newEntity = (LivingEntity) entity.getLocation().getWorld().spawnEntity(entityLocation, entityType);
-                    
+
                     if (newEntity instanceof Ageable) {
                         ((Ageable) newEntity).setAge(((Ageable) event.getEntity()).getAge());
                     }
