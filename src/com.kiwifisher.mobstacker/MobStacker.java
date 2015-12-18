@@ -20,11 +20,9 @@ public class MobStacker extends JavaPlugin {
     private  static WorldGuardPlugin worldGuard;
     private static ArrayList<String> regionsArray = new ArrayList<>();
 
-
     final String uid = "%%__USER__%%";
     final String rid = "%%__RESOURCE__%%";
     final String nonce = "%%__NONCE__%%";
-
 
     @Override
     public void onEnable() {

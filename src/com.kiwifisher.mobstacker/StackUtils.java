@@ -1,5 +1,6 @@
 package com.kiwifisher.mobstacker;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -39,6 +40,8 @@ public class StackUtils {
                         }
                     }
 
+                    cancel();
+
                 } else if(searchTime == 0) {
 
                     List<Entity> nearbyEntities = entity.getNearbyEntities(MobStacker.plugin.getConfig().getInt("stack-range.x"), MobStacker.plugin.getConfig().getInt("stack-range.y"), MobStacker.plugin.getConfig().getInt("stack-range.z"));
@@ -77,6 +80,7 @@ public class StackUtils {
             }
 
         }.runTaskTimer(MobStacker.plugin, 0L, 10L);
+
     }
 
 
@@ -91,20 +95,20 @@ public class StackUtils {
                 && MobStacker.plugin.getConfig().getBoolean("stack-spawn-method." + newEntitySpawnReason) &&
                 existingEntity.hasMetadata("quantity") && !existingEntity.isDead()) {
 
-            int newQuantity;
-
             if (existingEntity.getLocation().getBlockY() > newEntity.getLocation().getBlockY() && MobStacker.plugin.getConfig().getBoolean("stack-mobs-down.enable") &&
                     MobStacker.plugin.getConfig().getList("stack-mobs-down.mob-types").contains(newEntity.getType().toString())) {
-                stackEntities(newEntity, existingEntity, newEntitySpawnReason);
+                if (stackEntities(newEntity, existingEntity, newEntitySpawnReason)) {
+                    return true;
+                }
 
-            } else if (newEntity.getType() == existingEntity.getType() && !existingEntity.isDead() && newEntity.hasMetadata("quantity") &&
+            } else if (newEntity.getType() == existingEntity.getType() && !existingEntity.isDead() && !newEntity.isDead() && newEntity.hasMetadata("quantity") &&
                     (stackLeashed || !existingEntity.isLeashed() && !newEntity.isLeashed()) &&
                     (!stackByAge || !(newEntity instanceof Ageable) || (((Ageable) newEntity).isAdult() == ((Ageable) existingEntity).isAdult())) &&
                     (!protectTamed || !(newEntity instanceof Tameable) || (!((Tameable) newEntity).isTamed() && !((Tameable) existingEntity).isTamed())) &&
                     (!separateColour || !(newEntity instanceof Colorable) || (((Colorable) newEntity).getColor() == ((Colorable) existingEntity).getColor()))) {
 
                 int stackedEntityQuantity = existingEntity.getMetadata("quantity").get(0).asInt();
-                newQuantity = stackedEntityQuantity + newEntity.getMetadata("quantity").get(0).asInt();
+                int newQuantity = stackedEntityQuantity + newEntity.getMetadata("quantity").get(0).asInt();
 
                 existingEntity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, newQuantity));
                 String configNaming = MobStacker.plugin.getConfig().getString("stack-naming");

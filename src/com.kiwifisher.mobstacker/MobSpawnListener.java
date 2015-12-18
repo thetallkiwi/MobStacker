@@ -54,8 +54,6 @@ public class MobSpawnListener implements Listener {
 
                 spawnedCreature.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, 1));
 
-
-
                 StackUtils.attemptToStack(getSearchTime(), spawnedCreature, spawnReason);
 
             }
