@@ -36,32 +36,6 @@ public class MobDeathListener implements Listener {
 
                 List<Entity> nearbyEntities = entity.getNearbyEntities(MobStacker.plugin.getConfig().getInt("stack-range.x"), MobStacker.plugin.getConfig().getInt("stack-range.y"), MobStacker.plugin.getConfig().getInt("stack-range.z"));
 
-                if (nearbyEntities.size() >= 1) {
-
-                    for (Entity nearbyEntity : nearbyEntities) {
-
-                        if (nearbyEntity.getType() == entity.getType() && entity.isDead() && !nearbyEntity.isDead() &&
-                                (stackLeashed || !((LivingEntity) nearbyEntity).isLeashed()) &&
-                                (!stackByAge || !(entity instanceof Ageable) || (((Ageable) entity).isAdult() == ((Ageable) nearbyEntity).isAdult())) &&
-                                (!protectTamed || !(nearbyEntity instanceof Tameable)  || !((Tameable) nearbyEntity).isTamed() && !((Tameable) nearbyEntity).isTamed()) &&
-                                (!separateColour || !(nearbyEntity instanceof Colorable) || (((Colorable) nearbyEntity).getColor() != ((Colorable) entity).getColor())) &&
-                                nearbyEntity.hasMetadata("quantity")) {
-
-                            nearbyEntity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, entity.getMetadata("quantity").get(0).asInt() - 1 + nearbyEntity.getMetadata("quantity").get(0).asInt()));
-
-                            String configNaming = MobStacker.plugin.getConfig().getString("stack-naming");
-                            configNaming = configNaming.replace("{QTY}", nearbyEntity.getMetadata("quantity").get(0).asInt() + "");
-                            configNaming = configNaming.replace("{TYPE}", entity.getType().toString().replace("_", " "));
-                            configNaming = ChatColor.translateAlternateColorCodes('&', configNaming);
-                            nearbyEntity.setCustomName(configNaming);
-
-                            return;
-
-                        }
-                    }
-
-                }
-
                 int stackedEntityQuantity = entity.getMetadata("quantity").get(0).asInt();
                 int newQuantity = stackedEntityQuantity - 1;
 

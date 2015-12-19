@@ -45,8 +45,12 @@ stack-mobs-down:
 # Should coloured mobs, like sheep, be stacked separately?
 separate-stacks-by-color: true
 
-# Uplon leashing an entity, should the full stack be leashed, or just one?
+# Upon leashing an entity, should the full stack be leashed, or just one?
 leash-whole-stack: false
+
+# What should the max stack size be for certain mobs? If a mob isn't listed, the stack size isn't limied. Add Mobs as shown below to create a stack limit.
+max-stack-sizes:
+    IRON_GOLEM: 10
 
 # Mobs marked with true WILL attempt to stack. Mobs spawned by building (Golems and Wither) are a bit buggy, so it is suggested to leave them false.
 stack-mob-type:

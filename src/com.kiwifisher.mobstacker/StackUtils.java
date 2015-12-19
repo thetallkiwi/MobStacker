@@ -22,25 +22,34 @@ public class StackUtils {
 
             @Override
             public void run() {
-
-                count++;
-
+                
                 if (count <= limit) {
+
+                    count++;
 
                     List<Entity> nearbyEntities = entity.getNearbyEntities(MobStacker.plugin.getConfig().getInt("stack-range.x"), MobStacker.plugin.getConfig().getInt("stack-range.y"), MobStacker.plugin.getConfig().getInt("stack-range.z"));
 
                     if (nearbyEntities.size() > 0) {
                         for (Entity nearbyEntity : nearbyEntities) {
 
-                            if (nearbyEntity instanceof LivingEntity && !nearbyEntity.isDead() && stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
-                                count = limit + 1;
-                                cancel();
-                                break;
+                            int maxStackSize = 0;
+
+                            if (MobStacker.plugin.getConfig().contains(("max-stack-sizes.") + nearbyEntity.getType().toString())) {
+                                maxStackSize = MobStacker.plugin.getConfig().getInt("max-stack-sizes." + nearbyEntity.getType().toString());
+                            }
+
+
+                            if (nearbyEntity instanceof LivingEntity && !nearbyEntity.isDead() && (maxStackSize == 0 || nearbyEntity.getMetadata("quantity").get(0).asInt() < maxStackSize)) {
+
+                                if (stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
+                                    count = limit + 1;
+                                    cancel();
+                                    break;
+                                }
+
                             }
                         }
                     }
-
-                    cancel();
 
                 } else if(searchTime == 0) {
 
@@ -48,7 +57,14 @@ public class StackUtils {
 
                     for (Entity nearbyEntity : nearbyEntities) {
 
-                        if (nearbyEntity instanceof LivingEntity && !nearbyEntity.isDead() && stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
+                        int maxStackSize = 0;
+
+                        if (MobStacker.plugin.getConfig().contains(("max-stack-sizes.") + nearbyEntity.getType().toString())) {
+                            maxStackSize = MobStacker.plugin.getConfig().getInt("max-stack-sizes." + nearbyEntity.getType().toString());
+                        }
+
+                        if (nearbyEntity instanceof LivingEntity && !nearbyEntity.isDead() && (maxStackSize == 0 || nearbyEntity.getMetadata("quantity").get(0).asInt() < maxStackSize) &&
+                                stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
                             cancel();
                             break;
                         }
@@ -63,7 +79,14 @@ public class StackUtils {
 
                         for (Entity nearbyEntity : nearbyEntities) {
 
-                            if (nearbyEntity instanceof LivingEntity && !nearbyEntity.isDead() &&  stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
+                            int maxStackSize = 0;
+
+                            if (MobStacker.plugin.getConfig().contains(("max-stack-sizes.") + nearbyEntity.getType().toString())) {
+                                maxStackSize = MobStacker.plugin.getConfig().getInt("max-stack-sizes." + nearbyEntity.getType().toString());
+                            }
+
+                            if (nearbyEntity instanceof LivingEntity && !nearbyEntity.isDead() && (maxStackSize == 0 || nearbyEntity.getMetadata("quantity").get(0).asInt() < maxStackSize) &&
+                                    stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
                                 cancel();
                                 break;
                             }
@@ -109,6 +132,23 @@ public class StackUtils {
 
                 int stackedEntityQuantity = existingEntity.getMetadata("quantity").get(0).asInt();
                 int newQuantity = stackedEntityQuantity + newEntity.getMetadata("quantity").get(0).asInt();
+
+                if (MobStacker.plugin.getConfig().contains(("max-stack-sizes.") + newEntity.getType().toString())) {
+
+                    int maxStackSize = MobStacker.plugin.getConfig().getInt("max-stack-sizes." + newEntity.getType().toString());
+                    int remainderSize = 0;
+
+                    if (newQuantity > maxStackSize) {
+                        remainderSize = newQuantity - maxStackSize;
+                        newQuantity = maxStackSize;
+
+                        for (int i = 0; i < remainderSize; i++) {
+                            newEntity.getLocation().getWorld().spawnEntity(newEntity.getLocation(), existingEntity.getType());
+                        }
+
+                    }
+
+                }
 
                 existingEntity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, newQuantity));
                 String configNaming = MobStacker.plugin.getConfig().getString("stack-naming");
