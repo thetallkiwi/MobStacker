@@ -10,6 +10,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.material.Colorable;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
 
@@ -30,7 +32,22 @@ public class MobDeathListener implements Listener {
 
             if (entity.hasMetadata("quantity")) {
 
-                if (event.getEntity().getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FALL && MobStacker.plugin.getConfig().getBoolean("kill-whole-stack-on-fall-death")) {
+                if (event.getEntity().getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FALL && MobStacker.plugin.getConfig().getBoolean("kill-whole-stack-on-fall-death.enable") &&
+                        entity.hasMetadata("quantity")) {
+                    int quantity = entity.getMetadata("quantity").get(0).asInt();
+
+                    LivingEntity dyingEntity = entity;
+
+                    if (MobStacker.plugin.getConfig().getBoolean("kill-whole-stack-on-fall-death.multiply-loot")) {
+
+                        for (int i = 0; i < quantity; i++) {
+                            dyingEntity = StackUtils.peelOff(dyingEntity, false);
+                            dyingEntity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 5, 2));
+                            dyingEntity.setFallDistance(100);
+                        }
+
+                    }
+
                     return;
                 }
 
@@ -53,6 +70,10 @@ public class MobDeathListener implements Listener {
 
                     if (newEntity instanceof Colorable) {
                         ((Colorable) newEntity).setColor(((Colorable) event.getEntity()).getColor());
+                    }
+
+                    if (newEntity instanceof Sheep) {
+                        ((Sheep) newEntity).setSheared(((Sheep) event.getEntity()).isSheared());
                     }
 
                     newEntity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, newQuantity));

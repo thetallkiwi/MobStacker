@@ -22,7 +22,7 @@ public class StackUtils {
 
             @Override
             public void run() {
-                
+
                 if (count <= limit) {
 
                     count++;
@@ -39,7 +39,8 @@ public class StackUtils {
                             }
 
 
-                            if (nearbyEntity instanceof LivingEntity && !nearbyEntity.isDead() && (maxStackSize == 0 || nearbyEntity.getMetadata("quantity").get(0).asInt() < maxStackSize)) {
+                            if (nearbyEntity instanceof LivingEntity && !nearbyEntity.isDead() &&
+                                    (maxStackSize == 0 || ( nearbyEntity.hasMetadata("quantity") && nearbyEntity.getMetadata("quantity").get(0).asInt() < maxStackSize))) {
 
                                 if (stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
                                     count = limit + 1;
@@ -63,7 +64,8 @@ public class StackUtils {
                             maxStackSize = MobStacker.plugin.getConfig().getInt("max-stack-sizes." + nearbyEntity.getType().toString());
                         }
 
-                        if (nearbyEntity instanceof LivingEntity && !nearbyEntity.isDead() && (maxStackSize == 0 || nearbyEntity.getMetadata("quantity").get(0).asInt() < maxStackSize) &&
+                        if (nearbyEntity instanceof LivingEntity && !nearbyEntity.isDead() &&
+                                (maxStackSize == 0 || ( nearbyEntity.hasMetadata("quantity") && nearbyEntity.getMetadata("quantity").get(0).asInt() < maxStackSize)) &&
                                 stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
                             cancel();
                             break;
@@ -85,7 +87,8 @@ public class StackUtils {
                                 maxStackSize = MobStacker.plugin.getConfig().getInt("max-stack-sizes." + nearbyEntity.getType().toString());
                             }
 
-                            if (nearbyEntity instanceof LivingEntity && !nearbyEntity.isDead() && (maxStackSize == 0 || nearbyEntity.getMetadata("quantity").get(0).asInt() < maxStackSize) &&
+                            if (nearbyEntity instanceof LivingEntity && !nearbyEntity.isDead() &&
+                                    (maxStackSize == 0 || ( nearbyEntity.hasMetadata("quantity") && nearbyEntity.getMetadata("quantity").get(0).asInt() < maxStackSize)) &&
                                     stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
                                 cancel();
                                 break;
@@ -113,6 +116,7 @@ public class StackUtils {
         boolean stackLeashed = MobStacker.plugin.getConfig().getBoolean("stack-leashed-mobs");
         boolean protectTamed = MobStacker.plugin.getConfig().getBoolean("protect-tamed");
         boolean separateColour = MobStacker.plugin.getConfig().getBoolean("separate-stacks-by-color");
+        boolean separateSheared = MobStacker.plugin.getConfig().getBoolean("separate-by-sheared");
 
         if (newEntity.getType() == existingEntity.getType() && MobStacker.plugin.getConfig().getBoolean("stack-mob-type." + newEntity.getType().toString())
                 && MobStacker.plugin.getConfig().getBoolean("stack-spawn-method." + newEntitySpawnReason) &&
@@ -128,7 +132,8 @@ public class StackUtils {
                     (stackLeashed || !existingEntity.isLeashed() && !newEntity.isLeashed()) &&
                     (!stackByAge || !(newEntity instanceof Ageable) || (((Ageable) newEntity).isAdult() == ((Ageable) existingEntity).isAdult())) &&
                     (!protectTamed || !(newEntity instanceof Tameable) || (!((Tameable) newEntity).isTamed() && !((Tameable) existingEntity).isTamed())) &&
-                    (!separateColour || !(newEntity instanceof Colorable) || (((Colorable) newEntity).getColor() == ((Colorable) existingEntity).getColor()))) {
+                    (!separateColour || !(newEntity instanceof Colorable) || (((Colorable) newEntity).getColor() == ((Colorable) existingEntity).getColor())) &&
+                    (!separateSheared || !(newEntity instanceof Sheep) || (((Sheep) newEntity).isSheared() == ((Sheep) existingEntity).isSheared()))) {
 
                 int stackedEntityQuantity = existingEntity.getMetadata("quantity").get(0).asInt();
                 int newQuantity = stackedEntityQuantity + newEntity.getMetadata("quantity").get(0).asInt();
@@ -187,6 +192,10 @@ public class StackUtils {
 
         if (mobStack instanceof Colorable) {
             ((Colorable) newEntity).setColor(((Colorable) mobStack).getColor());
+        }
+
+        if (mobStack instanceof Sheep) {
+            ((Sheep) newEntity).setSheared(((Sheep) mobStack).isSheared());
         }
 
         newEntity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, newQuantity));

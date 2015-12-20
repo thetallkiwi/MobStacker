@@ -25,7 +25,9 @@ stack-leashed-aminals: false
 protect-tamed: true
 
 # If a stack of mobs fall off should the full stack die, or just one mob in the stack?
-kill-whole-stack-on-fall-death: true
+kill-whole-stack-on-fall-death:
+    enable: true
+    multiply-loot: true
 
 # If a creeper stack explodes, should the whole stack die?
 exploding-creeper-kills-stack: false
@@ -47,6 +49,9 @@ separate-stacks-by-color: true
 
 # Upon leashing an entity, should the full stack be leashed, or just one?
 leash-whole-stack: false
+
+# Should sheep be separated based on whether they are shorn or not?
+separate-by-sheared: true
 
 # What should the max stack size be for certain mobs? If a mob isn't listed, the stack size isn't limied. Add Mobs as shown below to create a stack limit.
 max-stack-sizes:

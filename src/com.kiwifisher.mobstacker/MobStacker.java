@@ -58,6 +58,9 @@ public class MobStacker extends JavaPlugin {
         plugin.getServer().getPluginManager().registerEvents(new EntityTameListener(), this);
         plugin.getServer().getPluginManager().registerEvents(new EntityExplodeListener(), this);
         plugin.getServer().getPluginManager().registerEvents(new PlayerLeashingHandler(), this);
+        plugin.getServer().getPluginManager().registerEvents(new PlayerShearEntityListener(), this);
+        plugin.getServer().getPluginManager().registerEvents(new SheepDyeListener(), this);
+        plugin.getServer().getPluginManager().registerEvents(new SheepRegrowWoolListener(), this);
 
         getCommand("mobstacker").setExecutor(new MobStackerCommands());
 
@@ -73,6 +76,7 @@ public class MobStacker extends JavaPlugin {
                 if (entity.hasMetadata("quantity")) {
                     entity.removeMetadata("quantity", plugin);
                     entity.setCustomName("");
+                    entity.setCustomNameVisible(true);
                 }
             }
         }

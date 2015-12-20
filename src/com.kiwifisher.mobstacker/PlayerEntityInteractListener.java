@@ -31,24 +31,6 @@ public class PlayerEntityInteractListener implements Listener {
 
         }
 
-        if (event.getPlayer().getItemInHand().getType() == Material.INK_SACK && event.getRightClicked().getType() == EntityType.SHEEP) {
-
-            Entity entity = event.getRightClicked();
-
-            if (entity.hasMetadata("quantity")) {
-
-                if (entity.getMetadata("quantity").get(0).asInt() > 1) {
-                    LivingEntity newEntity = StackUtils.peelOff(entity, true);
-
-                } else {
-                    StackUtils.attemptToStack(0, ((LivingEntity) entity), CreatureSpawnEvent.SpawnReason.CUSTOM);
-                }
-
-            }
-
-
-        }
-
     }
 
 }
