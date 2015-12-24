@@ -12,18 +12,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.material.Colorable;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import java.util.List;
 
 public class MobDeathListener implements Listener {
-
-    boolean stackByAge = MobStacker.plugin.getConfig().getBoolean("stack-by-age");
-    boolean stackLeashed = MobStacker.plugin.getConfig().getBoolean("stack-leashed-mobs");
-    boolean protectTamed = MobStacker.plugin.getConfig().getBoolean("protect-tamed");
-    boolean separateColour = MobStacker.plugin.getConfig().getBoolean("separate-stacks-by-color");
-
-
 
     @EventHandler (ignoreCancelled = true)
     public void mobDeathListener(EntityDeathEvent event) {
@@ -36,8 +27,6 @@ public class MobDeathListener implements Listener {
                 if (event.getEntity().getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FALL && MobStacker.plugin.getConfig().getBoolean("kill-whole-stack-on-fall-death.enable") &&
                         entity.hasMetadata("quantity")) {
                     int quantity = entity.getMetadata("quantity").get(0).asInt();
-
-                    LivingEntity dyingEntity = entity;
 
                     if (MobStacker.plugin.getConfig().getBoolean("kill-whole-stack-on-fall-death.multiply-loot")) {
 

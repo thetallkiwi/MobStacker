@@ -2,7 +2,6 @@ package com.kiwifisher.mobstacker.algorithms;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -12,7 +11,8 @@ public class PigZombieLootAlgorithm implements LootAlgorithm{
     private List<Loot> itemHashMap = new ArrayList<>();
 
     public PigZombieLootAlgorithm() {
-        itemHashMap.add(new Loot(Material.BLAZE_ROD, 0, 1));
+        itemHashMap.add(new Loot(Material.ROTTEN_FLESH, 0, 1));
+        itemHashMap.add(new Loot(Material.GOLD_NUGGET, 0, 1));
     }
 
     @Override
