@@ -1,6 +1,8 @@
-package com.kiwifisher.mobstacker;
+package com.kiwifisher.mobstacker.listeners;
 
-import org.bukkit.Bukkit;
+import com.kiwifisher.mobstacker.MobStacker;
+import com.kiwifisher.mobstacker.algorithms.AlgorithmEnum;
+import com.kiwifisher.mobstacker.utils.StackUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -12,7 +14,6 @@ import org.bukkit.material.Colorable;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
 import java.util.List;
 
 public class MobDeathListener implements Listener {
@@ -40,11 +41,8 @@ public class MobDeathListener implements Listener {
 
                     if (MobStacker.plugin.getConfig().getBoolean("kill-whole-stack-on-fall-death.multiply-loot")) {
 
-                        for (int i = 0; i < quantity; i++) {
-                            dyingEntity = StackUtils.peelOff(dyingEntity, false);
-                            dyingEntity.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 5, 2));
-                            dyingEntity.setFallDistance(100);
-                        }
+                        event.getDrops().clear();
+                        event.getDrops().addAll(AlgorithmEnum.valueOf(entity.getType().name()).getLootAlgorithm().getRandomLoot(quantity));
 
                     }
 

@@ -1,6 +1,8 @@
 package com.kiwifisher.mobstacker;
 
 import com.google.common.io.ByteStreams;
+import com.kiwifisher.mobstacker.commands.MobStackerCommands;
+import com.kiwifisher.mobstacker.listeners.*;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -57,7 +59,7 @@ public class MobStacker extends JavaPlugin {
         plugin.getServer().getPluginManager().registerEvents(new PlayerEntityInteractListener(), this);
         plugin.getServer().getPluginManager().registerEvents(new EntityTameListener(), this);
         plugin.getServer().getPluginManager().registerEvents(new EntityExplodeListener(), this);
-        plugin.getServer().getPluginManager().registerEvents(new PlayerLeashingHandler(), this);
+        plugin.getServer().getPluginManager().registerEvents(new PlayerLeashEntityListener(), this);
         plugin.getServer().getPluginManager().registerEvents(new PlayerShearEntityListener(), this);
         plugin.getServer().getPluginManager().registerEvents(new SheepDyeListener(), this);
         plugin.getServer().getPluginManager().registerEvents(new SheepRegrowWoolListener(), this);

@@ -1,5 +1,6 @@
-package com.kiwifisher.mobstacker;
+package com.kiwifisher.mobstacker.commands;
 
+import com.kiwifisher.mobstacker.MobStacker;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
