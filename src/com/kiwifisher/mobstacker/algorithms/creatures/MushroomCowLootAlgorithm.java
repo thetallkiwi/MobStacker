@@ -1,23 +1,27 @@
-package com.kiwifisher.mobstacker.algorithms;
+package com.kiwifisher.mobstacker.algorithms.creatures;
 
+import com.kiwifisher.mobstacker.algorithms.Loot;
+import com.kiwifisher.mobstacker.algorithms.LootAlgorithm;
 import org.bukkit.Material;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class PigZombieLootAlgorithm implements LootAlgorithm{
+public class MushroomCowLootAlgorithm implements LootAlgorithm {
 
-    private List<Loot> itemHashMap = new ArrayList<>();
+    private List<Loot> dropArrayList = new ArrayList<>();
 
-    public PigZombieLootAlgorithm() {
-        itemHashMap.add(new Loot(Material.ROTTEN_FLESH, 0, 1));
-        itemHashMap.add(new Loot(Material.GOLD_NUGGET, 0, 1));
+    public MushroomCowLootAlgorithm() {
+        dropArrayList.add(new Loot(Material.LEATHER, 0, 2));
+        dropArrayList.add(new Loot(Material.RAW_BEEF, 1, 3));
     }
 
     @Override
     public List<Loot> getLootArray() {
-        return this.itemHashMap;
+        return this.dropArrayList;
     }
 
     /**
@@ -26,7 +30,7 @@ public class PigZombieLootAlgorithm implements LootAlgorithm{
      * @return Returns the drops as an array
      */
     @Override
-    public List<ItemStack> getRandomLoot(int numberOfMobsWorth) {
+    public List<ItemStack> getRandomLoot(LivingEntity entity, int numberOfMobsWorth) {
 
         List<ItemStack> drops = new ArrayList<>();
 

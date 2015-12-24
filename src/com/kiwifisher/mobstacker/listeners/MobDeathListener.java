@@ -2,7 +2,6 @@ package com.kiwifisher.mobstacker.listeners;
 
 import com.kiwifisher.mobstacker.MobStacker;
 import com.kiwifisher.mobstacker.algorithms.AlgorithmEnum;
-import com.kiwifisher.mobstacker.utils.StackUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -28,11 +27,27 @@ public class MobDeathListener implements Listener {
                         entity.hasMetadata("quantity")) {
                     int quantity = entity.getMetadata("quantity").get(0).asInt();
 
-                    if (MobStacker.plugin.getConfig().getBoolean("kill-whole-stack-on-fall-death.multiply-loot")) {
+                    if (MobStacker.plugin.getConfig().getBoolean("kill-whole-stack-on-fall-death.multiply-loot") && quantity > 1) {
 
-                        event.getDrops().clear();
-                        event.getDrops().addAll(AlgorithmEnum.valueOf(entity.getType().name()).getLootAlgorithm().getRandomLoot(quantity));
+                            /*
+                            Try to drop the proportionate loot.
+                            */
+                        try {
+                            event.getDrops().addAll(AlgorithmEnum.valueOf(entity.getType().name()).getLootAlgorithm().getRandomLoot(entity, quantity - 1));
 
+                            /*
+                            If this fails, then log which entity and request it's implementation.
+                             */
+                        } catch (Exception e) {
+                            MobStacker.log(e.getMessage());
+                            MobStacker.log(entity.getType().name() + " doesn't have proportionate loot implemented - please request it be added if you need it");
+
+                            /*
+                            Regardless of it failing, drop the proportionate EXP.
+                             */
+                        } finally {
+                            event.setDroppedExp(event.getDroppedExp() * quantity);
+                        }
                     }
 
                     return;
