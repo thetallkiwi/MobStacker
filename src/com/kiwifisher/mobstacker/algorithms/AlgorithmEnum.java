@@ -4,7 +4,8 @@ import org.bukkit.entity.EntityType;
 
 public enum AlgorithmEnum {
 
-    BLAZE (new BlazeLootAlgorithm());
+    BLAZE (new BlazeLootAlgorithm()),
+    PIG_ZOMBIE(new PigZombieLootAlgorithm());
 
     private LootAlgorithm lootAlgorithm;
 
