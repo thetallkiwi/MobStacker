@@ -2,6 +2,7 @@ package com.kiwifisher.mobstacker.listeners;
 
 import com.kiwifisher.mobstacker.MobStacker;
 import com.kiwifisher.mobstacker.algorithms.AlgorithmEnum;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -21,7 +22,7 @@ public class MobDeathListener implements Listener {
         if (MobStacker.isStacking()) {
             LivingEntity entity = event.getEntity();
 
-            if (entity.hasMetadata("quantity")) {
+            if (entity.hasMetadata("quantity") && entity.hasMetadata("max-stack")) {
 
                 if (event.getEntity().getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FALL && MobStacker.plugin.getConfig().getBoolean("kill-whole-stack-on-fall-death.enable") &&
                         entity.hasMetadata("quantity")) {
@@ -60,10 +61,16 @@ public class MobDeathListener implements Listener {
 
                 Location entityLocation = entity.getLocation();
                 EntityType entityType = entity.getType();
+                boolean maxStack = entity.hasMetadata("max-stack") && entity.getMetadata("max-stack").get(0).asBoolean();
 
                 if (newQuantity > 0) {
 
                     entity.removeMetadata("quantity", MobStacker.plugin);
+
+                    if (maxStack) {
+                        MobSpawnListener.setSearchTime(-1);
+                    }
+
                     LivingEntity newEntity = (LivingEntity) entity.getLocation().getWorld().spawnEntity(entityLocation, entityType);
 
                     if (newEntity instanceof Ageable) {
@@ -79,6 +86,7 @@ public class MobDeathListener implements Listener {
                     }
 
                     newEntity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, newQuantity));
+                    newEntity.setMetadata("max-stack", new FixedMetadataValue(MobStacker.plugin, maxStack));
 
                     if (newQuantity > 1) {
 
@@ -89,6 +97,8 @@ public class MobDeathListener implements Listener {
                         newEntity.setCustomName(configNaming);
 
                     }
+
+                    MobSpawnListener.setSearchTime(MobStacker.plugin.getConfig().getInt("seconds-to-try-stack") * 20);
 
                 }
 

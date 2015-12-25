@@ -57,6 +57,10 @@ separate-by-sheared: true
 max-stack-sizes:
     IRON_GOLEM: 10
 
+# List worlds that no mobs will ever stack in. Write ALL world names in ONLY lower case.
+blacklist-world:
+    - example-world
+
 # Mobs marked with true WILL attempt to stack. Mobs spawned by building (Golems and Wither) are a bit buggy, so it is suggested to leave them false.
 stack-mob-type:
     BAT: true

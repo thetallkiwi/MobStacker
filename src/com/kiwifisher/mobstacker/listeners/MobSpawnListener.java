@@ -11,6 +11,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.util.List;
+
 public class MobSpawnListener implements Listener {
 
     private static int searchTime = MobStacker.plugin.getConfig().getInt("seconds-to-try-stack") * 20;
@@ -20,14 +22,13 @@ public class MobSpawnListener implements Listener {
     public static void setSearchTime(int searchTime) {
         MobSpawnListener.searchTime = searchTime;
     }
-    private static RegionManager regionManager;
 
     @EventHandler
     public void mobSpawnEvent(CreatureSpawnEvent event) {
 
         if (MobStacker.usesWorldGuard()) {
 
-            regionManager = MobStacker.getWorldGuard().getRegionManager(event.getEntity().getWorld());
+            RegionManager regionManager = MobStacker.getWorldGuard().getRegionManager(event.getEntity().getWorld());
 
             for (ProtectedRegion region : regionManager.getApplicableRegions(event.getEntity().getLocation()).getRegions()) {
 
@@ -55,8 +56,13 @@ public class MobSpawnListener implements Listener {
                     && MobStacker.plugin.getConfig().getBoolean("stack-spawn-method." + spawnReason) && !entityIsArmorStand && !spawnedCreature.isDead()) {
 
                 spawnedCreature.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, 1));
+                spawnedCreature.setMetadata("max-stack", new FixedMetadataValue(MobStacker.plugin, false));
 
-                StackUtils.attemptToStack(getSearchTime(), spawnedCreature, spawnReason);
+                List<String> worldBlackList = MobStacker.plugin.getConfig().getStringList("blacklist-world");
+
+                if (getSearchTime() > 0 && !worldBlackList.contains(spawnedCreature.getWorld().getName().toLowerCase())) {
+                    StackUtils.attemptToStack(getSearchTime(), spawnedCreature, spawnReason);
+                }
 
             }
         }
