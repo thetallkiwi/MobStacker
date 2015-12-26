@@ -122,7 +122,7 @@ public class StackUtils {
 
         if (newEntity.getType() == existingEntity.getType() && MobStacker.plugin.getConfig().getBoolean("stack-mob-type." + newEntity.getType().toString())
                 && MobStacker.plugin.getConfig().getBoolean("stack-spawn-method." + newEntitySpawnReason) &&
-                existingEntity.hasMetadata("quantity") && existingEntity.hasMetadata("max-stack") && !existingEntity.isDead()) {
+                existingEntity.hasMetadata("quantity") && existingEntity.hasMetadata("max-stack") && newEntity.hasMetadata("max-stack") && !existingEntity.isDead()) {
 
             if (existingEntity.getMetadata("max-stack").get(0).asBoolean() || newEntity.getMetadata("max-stack").get(0).asBoolean()) {
                 return false;
