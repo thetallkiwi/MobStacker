@@ -11,6 +11,9 @@ public class SheepRegrowWoolListener implements Listener {
     @EventHandler
     public void regrowEvent(SheepRegrowWoolEvent event) {
 
+        /*
+        When a sheep regrows it's wool, try to stack it.
+         */
         StackUtils.attemptToStack(0, event.getEntity(), CreatureSpawnEvent.SpawnReason.CUSTOM);
 
     }

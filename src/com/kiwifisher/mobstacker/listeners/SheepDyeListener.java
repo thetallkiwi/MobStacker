@@ -1,30 +1,40 @@
 package com.kiwifisher.mobstacker.listeners;
 
 import com.kiwifisher.mobstacker.utils.StackUtils;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
 
-/**
- * Created by Julian on 20/12/2015.
- */
 public class SheepDyeListener implements Listener {
 
     @EventHandler
     public void sheepDyeEvent(SheepDyeWoolEvent event) {
 
-        Entity entity = event.getEntity();
+        LivingEntity entity = event.getEntity();
 
-        if (entity.hasMetadata("quantity")) {
+        /*
+        If mob has valid meta data
+         */
+        if (StackUtils.hasRequiredData(entity)) {
 
-            if (entity.getMetadata("quantity").get(0).asInt() > 1) {
+            /*
+            If there is more than one mob in the stack then follow.
+             */
+            if (StackUtils.getStackSize(entity) > 1) {
+
+                /*
+                Peel off the dyed sheep.
+                 */
                 LivingEntity newEntity = StackUtils.peelOff(entity, true);
 
             } else {
-                StackUtils.attemptToStack(0, ((LivingEntity) entity), CreatureSpawnEvent.SpawnReason.CUSTOM);
+
+                /*
+                If it was the stack one, just try stack that fucker.
+                 */
+                StackUtils.attemptToStack(0, (entity), CreatureSpawnEvent.SpawnReason.CUSTOM);
             }
 
         }

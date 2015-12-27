@@ -14,16 +14,25 @@ public class PlayerShearEntityListener implements Listener {
     @EventHandler
     public void playerShearEntityEvent(PlayerShearEntityEvent event) {
 
-        if (event.getEntity() instanceof LivingEntity && ((LivingEntity) event.getEntity()).getType() == EntityType.SHEEP) {
+        /*
+        If the mob in question is a Sheep, then follow...
+         */
+        if (event.getEntity() instanceof LivingEntity && (event.getEntity()).getType() == EntityType.SHEEP) {
 
             LivingEntity entity = (LivingEntity) event.getEntity();
 
-            if (entity.hasMetadata("quantity")) {
+            if (StackUtils.hasRequiredData(entity)) {
 
-                if (entity.getMetadata("quantity").get(0).asInt() > 1) {
+                /*
+                If there's still a stack, peel it off.
+                 */
+                if (StackUtils.getStackSize(entity) > 1) {
                     LivingEntity newEntity = StackUtils.peelOff(entity, true);
 
                 } else {
+                    /*
+                    Try stack the shorn sheep.
+                     */
                     StackUtils.attemptToStack(0, entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
                 }
 

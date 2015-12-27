@@ -3,7 +3,7 @@ package com.kiwifisher.mobstacker.listeners;
 import com.kiwifisher.mobstacker.MobStacker;
 import com.kiwifisher.mobstacker.utils.StackUtils;
 import org.bukkit.Material;
-import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -14,15 +14,33 @@ public class PlayerEntityInteractListener implements Listener {
     @EventHandler
     public void interactEvent(PlayerInteractEntityEvent event) {
 
-        if (!MobStacker.plugin.getConfig().getBoolean("stack-custom-named-mobs") && event.getPlayer().getItemInHand().getType() == Material.NAME_TAG) {
+        /*
+        If a LivingEntity was right clicked with a name tag, and stack custom named mobs is false, then follow.
+         */
+        if (!MobStacker.plugin.getConfig().getBoolean("stack-custom-named-mobs") && event.getPlayer().getItemInHand().getType() == Material.NAME_TAG
+                && event.getRightClicked() instanceof LivingEntity) {
 
-            Entity entity = event.getRightClicked();
+            LivingEntity entity = (LivingEntity) event.getRightClicked();;
+
+            /*
+            Initialised blank name tag to get default name if it changes in future updates.
+             */
             ItemStack normalNameTag = new ItemStack(Material.NAME_TAG, 1, (byte) 0);
+
+            /*
+            Get the item the player is holding.
+             */
             ItemStack itemInHand = event.getPlayer().getItemInHand();
 
-            if (entity.hasMetadata("quantity") && !itemInHand.getItemMeta().getDisplayName().equalsIgnoreCase(normalNameTag.getItemMeta().getDisplayName())) {
+            /*
+            If the creature has the required data and the name tag isn't blank, then follow.
+             */
+            if (StackUtils.hasRequiredData(entity) && !itemInHand.getItemMeta().getDisplayName().equalsIgnoreCase(normalNameTag.getItemMeta().getDisplayName())) {
 
-                if (entity.getMetadata("quantity").get(0).asInt() > 1) { StackUtils.peelOff(entity, false); }
+                /*
+                If there is more than one creature in the stack, then peel one off and don't allow it to stack again.
+                 */
+                if (StackUtils.getStackSize(entity) > 1) { StackUtils.peelOff(entity, false); }
 
             }
 

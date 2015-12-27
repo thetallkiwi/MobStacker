@@ -2,8 +2,7 @@ package com.kiwifisher.mobstacker.listeners;
 
 import com.kiwifisher.mobstacker.MobStacker;
 import com.kiwifisher.mobstacker.algorithms.AlgorithmEnum;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import com.kiwifisher.mobstacker.utils.StackUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -11,23 +10,36 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.material.Colorable;
-import org.bukkit.metadata.FixedMetadataValue;
-import java.util.List;
 
 public class MobDeathListener implements Listener {
 
     @EventHandler (ignoreCancelled = true)
     public void mobDeathListener(EntityDeathEvent event) {
 
+        /*
+        Checks that we are stacking.
+         */
         if (MobStacker.isStacking()) {
+
+            /*
+            Get the entity that has just died.
+             */
             LivingEntity entity = event.getEntity();
 
-            if (entity.hasMetadata("quantity") && entity.hasMetadata("max-stack")) {
+            /*
+            If the entity was a stack, follow.
+             */
+            if (StackUtils.hasRequiredData(entity)) {
 
-                if (event.getEntity().getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FALL && MobStacker.plugin.getConfig().getBoolean("kill-whole-stack-on-fall-death.enable") &&
-                        entity.hasMetadata("quantity")) {
-                    int quantity = entity.getMetadata("quantity").get(0).asInt();
+                /*
+                If the stack fell to it's death, and we are killing the full stack on death my fall damage, follow.
+                 */
+                if (event.getEntity().getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FALL && MobStacker.plugin.getConfig().getBoolean("kill-whole-stack-on-fall-death.enable")) {
+                    int quantity = StackUtils.getStackSize(entity);
 
+                    /*
+                    If we are dropping proportionate loot, then follow.
+                     */
                     if (MobStacker.plugin.getConfig().getBoolean("kill-whole-stack-on-fall-death.multiply-loot") && quantity > 1) {
 
                             /*
@@ -54,25 +66,44 @@ public class MobDeathListener implements Listener {
                     return;
                 }
 
-                List<Entity> nearbyEntities = entity.getNearbyEntities(MobStacker.plugin.getConfig().getInt("stack-range.x"), MobStacker.plugin.getConfig().getInt("stack-range.y"), MobStacker.plugin.getConfig().getInt("stack-range.z"));
-
-                int stackedEntityQuantity = entity.getMetadata("quantity").get(0).asInt();
-                int newQuantity = stackedEntityQuantity - 1;
+                /*
+                If the mob has died any way other than fall damage, then follow.
+                 */
+                int newQuantity = StackUtils.getStackSize(entity) - 1;
 
                 Location entityLocation = entity.getLocation();
                 EntityType entityType = entity.getType();
-                boolean maxStack = entity.hasMetadata("max-stack") && entity.getMetadata("max-stack").get(0).asBoolean();
 
+                /*
+                Check if the entity is or was ever a max stack for continuity.
+                 */
+                boolean maxStack = entity.getMetadata("max-stack").get(0).asBoolean();
+
+                /*
+                If there is a remaining stack...
+                 */
                 if (newQuantity > 0) {
 
+                    /*
+                    Remove it's quantity data so other mobs don't try stack to it is .isDead() fails.
+                     */
                     entity.removeMetadata("quantity", MobStacker.plugin);
 
+                    /*
+                    If it's a max stack, then don't try stack to anything around it.
+                     */
                     if (maxStack) {
                         MobSpawnListener.setSearchTime(-1);
                     }
 
+                    /*
+                    Spawn in a replacement entity.
+                     */
                     LivingEntity newEntity = (LivingEntity) entity.getLocation().getWorld().spawnEntity(entityLocation, entityType);
 
+                    /*
+                    Assign all attributes so the mob looks the same.
+                     */
                     if (newEntity instanceof Ageable) {
                         ((Ageable) newEntity).setAge(((Ageable) event.getEntity()).getAge());
                     }
@@ -85,19 +116,24 @@ public class MobDeathListener implements Listener {
                         ((Sheep) newEntity).setSheared(((Sheep) event.getEntity()).isSheared());
                     }
 
-                    newEntity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, newQuantity));
-                    newEntity.setMetadata("max-stack", new FixedMetadataValue(MobStacker.plugin, maxStack));
+                    /*
+                    Set new meta data
+                     */
+                    StackUtils.setMaxStack(newEntity, maxStack);
+                    StackUtils.setStackSize(newEntity, newQuantity);
 
+                    /*
+                    If there is still a remaining stack, rename it.
+                     */
                     if (newQuantity > 1) {
 
-                        String configNaming = MobStacker.plugin.getConfig().getString("stack-naming");
-                        configNaming = configNaming.replace("{QTY}", newQuantity + "");
-                        configNaming = configNaming.replace("{TYPE}", entity.getType().toString().replace("_", " "));
-                        configNaming = ChatColor.translateAlternateColorCodes('&', configNaming);
-                        newEntity.setCustomName(configNaming);
+                        StackUtils.renameStack(newEntity, newQuantity);
 
                     }
 
+                    /*
+                    Set search time back to normal.
+                     */
                     MobSpawnListener.setSearchTime(MobStacker.plugin.getConfig().getInt("seconds-to-try-stack") * 20);
 
                 }
