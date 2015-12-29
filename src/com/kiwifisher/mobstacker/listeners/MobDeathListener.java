@@ -13,13 +13,19 @@ import org.bukkit.material.Colorable;
 
 public class MobDeathListener implements Listener {
 
+    private MobStacker plugin;
+
+    public MobDeathListener(MobStacker plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler (ignoreCancelled = true)
     public void mobDeathListener(EntityDeathEvent event) {
 
         /*
         Checks that we are stacking.
          */
-        if (MobStacker.isStacking()) {
+        if (getPlugin().isStacking()) {
 
             /*
             Get the entity that has just died.
@@ -34,13 +40,13 @@ public class MobDeathListener implements Listener {
                 /*
                 If the stack fell to it's death, and we are killing the full stack on death my fall damage, follow.
                  */
-                if (event.getEntity().getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FALL && MobStacker.plugin.getConfig().getBoolean("kill-whole-stack-on-fall-death.enable")) {
+                if (event.getEntity().getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FALL && getPlugin().getConfig().getBoolean("kill-whole-stack-on-fall-death.enable")) {
                     int quantity = StackUtils.getStackSize(entity);
 
                     /*
                     If we are dropping proportionate loot, then follow.
                      */
-                    if (MobStacker.plugin.getConfig().getBoolean("kill-whole-stack-on-fall-death.multiply-loot") && quantity > 1) {
+                    if (getPlugin().getConfig().getBoolean("kill-whole-stack-on-fall-death.multiply-loot") && quantity > 1) {
 
                             /*
                             Try to drop the proportionate loot.
@@ -52,8 +58,8 @@ public class MobDeathListener implements Listener {
                             If this fails, then log which entity and request it's implementation.
                              */
                         } catch (Exception e) {
-                            MobStacker.log(e.getMessage());
-                            MobStacker.log(entity.getType().name() + " doesn't have proportionate loot implemented - please request it be added if you need it");
+                            getPlugin().log(e.getMessage());
+                            getPlugin().log(entity.getType().name() + " doesn't have proportionate loot implemented - please request it be added if you need it");
 
                             /*
                             Regardless of it failing, drop the proportionate EXP.
@@ -87,19 +93,34 @@ public class MobDeathListener implements Listener {
                     /*
                     Remove it's quantity data so other mobs don't try stack to it is .isDead() fails.
                      */
-                    entity.removeMetadata("quantity", MobStacker.plugin);
+                    entity.removeMetadata("quantity", getPlugin());
 
                     /*
                     If it's a max stack, then don't try stack to anything around it.
                      */
                     if (maxStack) {
-                        MobSpawnListener.setSearchTime(-1);
+                        getPlugin().setSearchTime(-1);
                     }
 
                     /*
                     Spawn in a replacement entity.
                      */
                     LivingEntity newEntity = (LivingEntity) entity.getLocation().getWorld().spawnEntity(entityLocation, entityType);
+
+                    /*
+                    If the entity was in fire, or burning, then any remaining ticks left on the previous mob will be passed on to the new one.
+                     */
+                    if ((entity.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FIRE ||
+                            entity.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FIRE_TICK) &&
+                            getPlugin().getConfig().getBoolean("carry-over-fire.enabled")) {
+
+                        if(!getPlugin().getConfig().getBoolean("carry-over-fire.start-new-burn")) {
+                            newEntity.setFireTicks(entity.getFireTicks());
+                        } else if(getPlugin().getConfig().getBoolean("carry-over-fire.start-new-burn")) {
+                            newEntity.setFireTicks(entity.getMaxFireTicks());
+                        }
+
+                    }
 
                     /*
                     Assign all attributes so the mob looks the same.
@@ -119,22 +140,22 @@ public class MobDeathListener implements Listener {
                     /*
                     Set new meta data
                      */
-                    StackUtils.setMaxStack(newEntity, maxStack);
-                    StackUtils.setStackSize(newEntity, newQuantity);
+                    getPlugin().getStackUtils().setMaxStack(newEntity, maxStack);
+                    getPlugin().getStackUtils().setStackSize(newEntity, newQuantity);
 
                     /*
                     If there is still a remaining stack, rename it.
                      */
                     if (newQuantity > 1) {
 
-                        StackUtils.renameStack(newEntity, newQuantity);
+                        getPlugin().getStackUtils().renameStack(newEntity, newQuantity);
 
                     }
 
                     /*
                     Set search time back to normal.
                      */
-                    MobSpawnListener.setSearchTime(MobStacker.plugin.getConfig().getInt("seconds-to-try-stack") * 20);
+                    getPlugin().setSearchTime(getPlugin().getConfig().getInt("seconds-to-try-stack") * 20);
 
                 }
 
@@ -143,4 +164,7 @@ public class MobDeathListener implements Listener {
 
     }
 
+    public MobStacker getPlugin() {
+        return plugin;
+    }
 }

@@ -12,13 +12,19 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 public class EntityExplodeListener implements Listener {
 
+    private MobStacker plugin;
+
+    public EntityExplodeListener(MobStacker plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler
     public void entityExplodeListener(EntityExplodeEvent event) {
 
         /*
         If there is a LivingEntity exploding and we have kill full stack set to false, then execute this block.
          */
-        if (event.getEntity() instanceof LivingEntity && !MobStacker.plugin.getConfig().getBoolean("exploding-creeper-kills-stack")) {
+        if (event.getEntity() instanceof LivingEntity && !getPlugin().getConfig().getBoolean("exploding-creeper-kills-stack")) {
 
             LivingEntity entity = ((LivingEntity) event.getEntity());
 
@@ -45,14 +51,14 @@ public class EntityExplodeListener implements Listener {
                     /*
                     Set the stacks new size.
                      */
-                    StackUtils.setStackSize(newEntity, newQuantity);
+                    getPlugin().getStackUtils().setStackSize(newEntity, newQuantity);
 
                     /*
                     If a stack is larger than one, then give it the appropriate name.
                      */
                     if (newQuantity > 1) {
 
-                        StackUtils.renameStack(newEntity, newQuantity);
+                        getPlugin().getStackUtils().renameStack(newEntity, newQuantity);
 
                     }
 
@@ -63,8 +69,8 @@ public class EntityExplodeListener implements Listener {
             /*
             If config is set to kill the full stack AND amplify explosions, then follow.
              */
-        } else if (event.getEntity() instanceof LivingEntity && MobStacker.plugin.getConfig().getBoolean("exploding-creeper-kills-stack") &&
-                MobStacker.plugin.getConfig().getBoolean("magnify-stack-explosion.enable")) {
+        } else if (event.getEntity() instanceof LivingEntity && getPlugin().getConfig().getBoolean("exploding-creeper-kills-stack") &&
+                getPlugin().getConfig().getBoolean("magnify-stack-explosion.enable")) {
 
             /*
             Get the bastard exploding.
@@ -79,13 +85,13 @@ public class EntityExplodeListener implements Listener {
             /*
             Set there to be only one mob in the stack so when it blows up, it dies, giving the illusion that all have died.
              */
-            StackUtils.setStackSize(entity, 1);
+            getPlugin().getStackUtils().setStackSize(entity, 1);
 
             /*
             If the number of creepers in the stack is greater than the max explosion size, set the explosion size to the max.
              */
-            if (quantity > MobStacker.plugin.getConfig().getInt("magnify-stack-explosion.max-creeper-explosion-size")) {
-                quantity = MobStacker.plugin.getConfig().getInt("magnify-stack-explosion.max-creeper-explosion-size");
+            if (quantity > getPlugin().getConfig().getInt("magnify-stack-explosion.max-creeper-explosion-size")) {
+                quantity = getPlugin().getConfig().getInt("magnify-stack-explosion.max-creeper-explosion-size");
             }
 
             /*
@@ -97,4 +103,7 @@ public class EntityExplodeListener implements Listener {
 
     }
 
+    public MobStacker getPlugin() {
+        return plugin;
+    }
 }

@@ -1,5 +1,6 @@
 package com.kiwifisher.mobstacker.listeners;
 
+import com.kiwifisher.mobstacker.MobStacker;
 import com.kiwifisher.mobstacker.utils.StackUtils;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -10,6 +11,12 @@ import org.bukkit.event.player.PlayerShearEntityEvent;
 
 
 public class PlayerShearEntityListener implements Listener {
+
+    private MobStacker plugin;
+
+    public PlayerShearEntityListener(MobStacker plugin) {
+        this.plugin = plugin;
+    }
 
     @EventHandler
     public void playerShearEntityEvent(PlayerShearEntityEvent event) {
@@ -27,13 +34,13 @@ public class PlayerShearEntityListener implements Listener {
                 If there's still a stack, peel it off.
                  */
                 if (StackUtils.getStackSize(entity) > 1) {
-                    LivingEntity newEntity = StackUtils.peelOff(entity, true);
+                    LivingEntity newEntity = getPlugin().getStackUtils().peelOff(entity, true);
 
                 } else {
                     /*
                     Try stack the shorn sheep.
                      */
-                    StackUtils.attemptToStack(0, entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+                    getPlugin().getStackUtils().attemptToStack(0, entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
                 }
 
             }
@@ -42,4 +49,7 @@ public class PlayerShearEntityListener implements Listener {
 
     }
 
+    public MobStacker getPlugin() {
+        return plugin;
+    }
 }

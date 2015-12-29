@@ -9,7 +9,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class PlayerEntityInteractListener implements Listener {
+public class PlayerRenameEntityListener implements Listener {
+
+    private MobStacker plugin;
+
+    public PlayerRenameEntityListener(MobStacker plugin) {
+        this.plugin = plugin;
+    }
 
     @EventHandler
     public void interactEvent(PlayerInteractEntityEvent event) {
@@ -17,7 +23,7 @@ public class PlayerEntityInteractListener implements Listener {
         /*
         If a LivingEntity was right clicked with a name tag, and stack custom named mobs is false, then follow.
          */
-        if (!MobStacker.plugin.getConfig().getBoolean("stack-custom-named-mobs") && event.getPlayer().getItemInHand().getType() == Material.NAME_TAG
+        if (!getPlugin().getConfig().getBoolean("stack-custom-named-mobs") && event.getPlayer().getItemInHand().getType() == Material.NAME_TAG
                 && event.getRightClicked() instanceof LivingEntity) {
 
             LivingEntity entity = (LivingEntity) event.getRightClicked();;
@@ -40,7 +46,7 @@ public class PlayerEntityInteractListener implements Listener {
                 /*
                 If there is more than one creature in the stack, then peel one off and don't allow it to stack again.
                  */
-                if (StackUtils.getStackSize(entity) > 1) { StackUtils.peelOff(entity, false); }
+                if (StackUtils.getStackSize(entity) > 1) { getPlugin().getStackUtils().peelOff(entity, false); }
 
             }
 
@@ -49,4 +55,7 @@ public class PlayerEntityInteractListener implements Listener {
 
     }
 
+    public MobStacker getPlugin() {
+        return plugin;
+    }
 }

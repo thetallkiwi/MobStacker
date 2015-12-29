@@ -3,6 +3,7 @@ package com.kiwifisher.mobstacker;
 import com.google.common.io.ByteStreams;
 import com.kiwifisher.mobstacker.commands.MobStackerCommands;
 import com.kiwifisher.mobstacker.listeners.*;
+import com.kiwifisher.mobstacker.utils.StackUtils;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -11,28 +12,30 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mcstats.Metrics;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
 public class MobStacker extends JavaPlugin {
 
-    public static Plugin plugin;
-    private static boolean stacking = true;
-    private static boolean worldGuardEnabled;
-    private  static WorldGuardPlugin worldGuard;
-    private static ArrayList<String> regionsArray = new ArrayList<>();
+    private boolean stacking = true;
+    private boolean worldGuardEnabled;
+    private WorldGuardPlugin worldGuard;
+    private ArrayList<String> regionsArray = new ArrayList<>();
+    private int searchTime = getConfig().getInt("seconds-to-try-stack") * 20;
+    private StackUtils stackUtils;
 
     final String uid = "%%__USER__%%";
     final String rid = "%%__RESOURCE__%%";
     final String nonce = "%%__NONCE__%%";
 
+    HashMap<UUID, Integer> killsHash = new HashMap<>();
+
     @Override
     public void onEnable() {
 
-        plugin = this;
-
         log("MobStacker is starting");
         loadResource(this, "config.yml");
+
+        this.stackUtils = new StackUtils(this);
 
         try {
             Metrics metrics = new Metrics(this);
@@ -54,17 +57,17 @@ public class MobStacker extends JavaPlugin {
             updateExcludedRegions();
         }
 
-        plugin.getServer().getPluginManager().registerEvents(new MobSpawnListener(), this);
-        plugin.getServer().getPluginManager().registerEvents(new MobDeathListener(), this);
-        plugin.getServer().getPluginManager().registerEvents(new PlayerEntityInteractListener(), this);
-        plugin.getServer().getPluginManager().registerEvents(new EntityTameListener(), this);
-        plugin.getServer().getPluginManager().registerEvents(new EntityExplodeListener(), this);
-        plugin.getServer().getPluginManager().registerEvents(new PlayerLeashEntityListener(), this);
-        plugin.getServer().getPluginManager().registerEvents(new PlayerShearEntityListener(), this);
-        plugin.getServer().getPluginManager().registerEvents(new SheepDyeListener(), this);
-        plugin.getServer().getPluginManager().registerEvents(new SheepRegrowWoolListener(), this);
+        this.getServer().getPluginManager().registerEvents(new MobSpawnListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new MobDeathListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerRenameEntityListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new EntityTameListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new EntityExplodeListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerLeashEntityListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerShearEntityListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new SheepDyeListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new SheepRegrowWoolListener(this), this);
 
-        getCommand("mobstacker").setExecutor(new MobStackerCommands());
+        getCommand("mobstacker").setExecutor(new MobStackerCommands(this));
 
         log("MobStacker has successfully started!");
 
@@ -76,7 +79,7 @@ public class MobStacker extends JavaPlugin {
         for (World world : getServer().getWorlds()) {
             for (LivingEntity entity : world.getLivingEntities()) {
                 if (entity.hasMetadata("quantity")) {
-                    entity.removeMetadata("quantity", plugin);
+                    entity.removeMetadata("quantity", this);
                     entity.setCustomName("");
                     entity.setCustomNameVisible(true);
                 }
@@ -87,7 +90,7 @@ public class MobStacker extends JavaPlugin {
 
     }
 
-    public static File loadResource(Plugin plugin, String resource) {
+    public File loadResource(Plugin plugin, String resource) {
         File folder = plugin.getDataFolder();
         if (!folder.exists())
             folder.mkdir();
@@ -104,7 +107,7 @@ public class MobStacker extends JavaPlugin {
         return resourceFile;
     }
 
-    public static void updateExcludedRegions() {
+    public void updateExcludedRegions() {
         try {
             Scanner scanner = new Scanner(new File(getWorldGuard().getDataFolder() + "/mobstacker-excluded-regions.yml"));
             regionsArray.clear();
@@ -127,7 +130,7 @@ public class MobStacker extends JavaPlugin {
 
     }
 
-    public static boolean regionAllowedToStack(String regionID) {
+    public boolean regionAllowedToStack(String regionID) {
         return !regionsArray.contains(regionID);
     }
 
@@ -143,22 +146,33 @@ public class MobStacker extends JavaPlugin {
 
     }
 
-    public static void log(String string) {
-        plugin.getLogger().info(string);
+    public void log(String string) {
+        this.getLogger().info(string);
     }
 
-    public static boolean isStacking() {
+    public boolean isStacking() {
         return stacking;
     }
 
-    public static void setStacking(boolean bool) {
+    public void setStacking(boolean bool) {
         stacking = bool;
     }
 
-    public static void setUsesWorldGuard(boolean status) { worldGuardEnabled = status; }
+    public void setUsesWorldGuard(boolean status) { worldGuardEnabled = status; }
 
-    public static boolean usesWorldGuard() { return worldGuardEnabled; }
+    public boolean usesWorldGuard() { return worldGuardEnabled; }
 
-    public static WorldGuardPlugin getWorldGuard() { return worldGuard;}
+    public WorldGuardPlugin getWorldGuard() { return worldGuard;}
 
+    public int getSearchTime() {
+        return searchTime;
+    }
+
+    public void setSearchTime(int searchTime) {
+        this.searchTime = searchTime;
+    }
+
+    public StackUtils getStackUtils() {
+        return stackUtils;
+    }
 }

@@ -1,5 +1,6 @@
 package com.kiwifisher.mobstacker.listeners;
 
+import com.kiwifisher.mobstacker.MobStacker;
 import com.kiwifisher.mobstacker.utils.StackUtils;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.LivingEntity;
@@ -10,6 +11,12 @@ import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.material.Colorable;
 
 public class EntityTameListener implements Listener {
+
+    private MobStacker plugin;
+
+    public EntityTameListener(MobStacker plugin) {
+        this.plugin = plugin;
+    }
 
     @EventHandler
     public void onEntityTameEvent(EntityTameEvent event) {
@@ -36,7 +43,7 @@ public class EntityTameListener implements Listener {
              */
             if (newQuantity > 0) {
 
-                LivingEntity newEntity = StackUtils.peelOff(entity, false);
+                LivingEntity newEntity = getPlugin().getStackUtils().peelOff(entity, false);
 
                 /*
                 If there was an age in question, then assign it.
@@ -69,4 +76,7 @@ public class EntityTameListener implements Listener {
         }
     }
 
+    public MobStacker getPlugin() {
+        return plugin;
+    }
 }

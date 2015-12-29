@@ -53,6 +53,13 @@ leash-whole-stack: false
 # Should sheep be separated based on whether they are shorn or not?
 separate-by-sheared: true
 
+# If a burning stack dies, should the remaining burn time for the previous mob be carried on to the next?
+carry-over-fire:
+  enabled: true
+  # If star-new-burn is true, it will be as if the next mob in the stack has been set on fire again, otherwise it will only burn for the remaining
+  # time of the previous mob.
+  start-new-burn: false
+
 # What should the max stack size be for certain mobs? If a mob isn't listed, the stack size isn't limied. Add Mobs as shown below to create a stack limit.
 max-stack-sizes:
     IRON_GOLEM: 10

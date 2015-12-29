@@ -17,7 +17,13 @@ import java.util.List;
  */
 public class StackUtils {
 
-    public static void attemptToStack(final int searchTime, final LivingEntity entity, final CreatureSpawnEvent.SpawnReason spawnReason) {
+    public MobStacker plugin;
+
+    public StackUtils(MobStacker plugin) {
+        this.plugin = plugin;
+    }
+
+    public void attemptToStack(final int searchTime, final LivingEntity entity, final CreatureSpawnEvent.SpawnReason spawnReason) {
 
         new BukkitRunnable() {
 
@@ -35,7 +41,7 @@ public class StackUtils {
 
                     count++;
 
-                    List<Entity> nearbyEntities = entity.getNearbyEntities(MobStacker.plugin.getConfig().getInt("stack-range.x"), MobStacker.plugin.getConfig().getInt("stack-range.y"), MobStacker.plugin.getConfig().getInt("stack-range.z"));
+                    List<Entity> nearbyEntities = entity.getNearbyEntities(getPlugin().getConfig().getInt("stack-range.x"), getPlugin().getConfig().getInt("stack-range.y"), getPlugin().getConfig().getInt("stack-range.z"));
 
                     /*
                     Get all nearby entities.
@@ -48,8 +54,8 @@ public class StackUtils {
                             /*
                             If a max stack size is imposed, assign it to the integer maxStackSize.
                              */
-                            if (MobStacker.plugin.getConfig().contains(("max-stack-sizes.") + nearbyEntity.getType().toString())) {
-                                maxStackSize = MobStacker.plugin.getConfig().getInt("max-stack-sizes." + nearbyEntity.getType().toString());
+                            if (getPlugin().getConfig().contains(("max-stack-sizes.") + nearbyEntity.getType().toString())) {
+                                maxStackSize = getPlugin().getConfig().getInt("max-stack-sizes." + nearbyEntity.getType().toString());
                             }
 
 
@@ -77,7 +83,7 @@ public class StackUtils {
                      */
                 } else if(searchTime == 0) {
 
-                    List<Entity> nearbyEntities = entity.getNearbyEntities(MobStacker.plugin.getConfig().getInt("stack-range.x"), MobStacker.plugin.getConfig().getInt("stack-range.y"), MobStacker.plugin.getConfig().getInt("stack-range.z"));
+                    List<Entity> nearbyEntities = entity.getNearbyEntities(getPlugin().getConfig().getInt("stack-range.x"), getPlugin().getConfig().getInt("stack-range.y"), getPlugin().getConfig().getInt("stack-range.z"));
 
                     /*
                     Get the nearby entities.
@@ -89,8 +95,8 @@ public class StackUtils {
                         /*
                         If a max stack size is imposed, assign it to the integer maxStackSize.
                          */
-                        if (MobStacker.plugin.getConfig().contains(("max-stack-sizes.") + nearbyEntity.getType().toString())) {
-                            maxStackSize = MobStacker.plugin.getConfig().getInt("max-stack-sizes." + nearbyEntity.getType().toString());
+                        if (getPlugin().getConfig().contains(("max-stack-sizes.") + nearbyEntity.getType().toString())) {
+                            maxStackSize = getPlugin().getConfig().getInt("max-stack-sizes." + nearbyEntity.getType().toString());
                         }
 
                         /*
@@ -125,7 +131,7 @@ public class StackUtils {
                         /*
                         Gets nearby entities.
                          */
-                        List<Entity> nearbyEntities = entity.getNearbyEntities(MobStacker.plugin.getConfig().getInt("stack-range.x"), MobStacker.plugin.getConfig().getInt("stack-range.y"), MobStacker.plugin.getConfig().getInt("stack-range.z"));
+                        List<Entity> nearbyEntities = entity.getNearbyEntities(getPlugin().getConfig().getInt("stack-range.x"), getPlugin().getConfig().getInt("stack-range.y"), getPlugin().getConfig().getInt("stack-range.z"));
 
                         for (Entity nearbyEntity : nearbyEntities) {
 
@@ -134,8 +140,8 @@ public class StackUtils {
                             /*
                             If a max stack size is imposed, assign it to the integer maxStackSize.
                             */
-                            if (MobStacker.plugin.getConfig().contains(("max-stack-sizes.") + nearbyEntity.getType().toString())) {
-                                maxStackSize = MobStacker.plugin.getConfig().getInt("max-stack-sizes." + nearbyEntity.getType().toString());
+                            if (getPlugin().getConfig().contains(("max-stack-sizes.") + nearbyEntity.getType().toString())) {
+                                maxStackSize = getPlugin().getConfig().getInt("max-stack-sizes." + nearbyEntity.getType().toString());
                             }
 
                             /*
@@ -167,7 +173,7 @@ public class StackUtils {
             /*
             Search every 10 ticks (0.5 seconds on a fully performing server.)
              */
-        }.runTaskTimer(MobStacker.plugin, 0L, 10L);
+        }.runTaskTimer(getPlugin(), 0L, 10L);
 
     }
 
@@ -180,13 +186,13 @@ public class StackUtils {
      * @param newEntitySpawnReason Spawn reason needed to check if this reason is allowed to stack in the config
      * @return Returns a boolean stating whether the stacks were merged successfully.
      */
-    public static boolean stackEntities(LivingEntity existingEntity, LivingEntity newEntity, CreatureSpawnEvent.SpawnReason newEntitySpawnReason) {
+    public boolean stackEntities(LivingEntity existingEntity, LivingEntity newEntity, CreatureSpawnEvent.SpawnReason newEntitySpawnReason) {
 
         /*
         Booleans representing various config values.
          */
-        boolean mobAllowedToStack = MobStacker.plugin.getConfig().getBoolean("stack-mob-type." + newEntity.getType().toString());
-        boolean spawnReasonAllowedToStack = MobStacker.plugin.getConfig().getBoolean("stack-spawn-method." + newEntitySpawnReason);
+        boolean mobAllowedToStack = getPlugin().getConfig().getBoolean("stack-mob-type." + newEntity.getType().toString());
+        boolean spawnReasonAllowedToStack = getPlugin().getConfig().getBoolean("stack-spawn-method." + newEntitySpawnReason);
 
         /*
         Various checks to make sure the mob is allowed to stack.
@@ -205,8 +211,8 @@ public class StackUtils {
             If the mob is meant to stack down, and the new entity is lower than the existing entity, then this method will be recursively called
             flipping newEntity and existingEntity as parameters.
              */
-            if (existingEntity.getLocation().getBlockY() > newEntity.getLocation().getBlockY() && MobStacker.plugin.getConfig().getBoolean("stack-mobs-down.enable") &&
-                    MobStacker.plugin.getConfig().getList("stack-mobs-down.mob-types").contains(newEntity.getType().toString())) {
+            if (existingEntity.getLocation().getBlockY() > newEntity.getLocation().getBlockY() && getPlugin().getConfig().getBoolean("stack-mobs-down.enable") &&
+                    getPlugin().getConfig().getList("stack-mobs-down.mob-types").contains(newEntity.getType().toString())) {
                 if (stackEntities(newEntity, existingEntity, newEntitySpawnReason)) {
                     return true;
                 }
@@ -227,9 +233,9 @@ public class StackUtils {
                 /*
                 If the config say the plugin has a max stack size, then check what it is, and handle it.
                  */
-                if (MobStacker.plugin.getConfig().contains(("max-stack-sizes.") + newEntity.getType().toString())) {
+                if (getPlugin().getConfig().contains(("max-stack-sizes.") + newEntity.getType().toString())) {
 
-                    int maxStackSize = MobStacker.plugin.getConfig().getInt("max-stack-sizes." + newEntity.getType().toString());
+                    int maxStackSize = getPlugin().getConfig().getInt("max-stack-sizes." + newEntity.getType().toString());
                     int remainderSize = 0;
 
                     /*
@@ -271,7 +277,7 @@ public class StackUtils {
      * @param restackable Should the mob that has peeled off be allowed to stack again?
      * @return Returns the new stack.
      */
-    public static LivingEntity peelOff(LivingEntity mobStack, boolean restackable) {
+    public LivingEntity peelOff(LivingEntity mobStack, boolean restackable) {
 
         /*
         Collecting information on the mob.
@@ -283,7 +289,7 @@ public class StackUtils {
         /*
         Set the search time. If this doesn't happen, shit breaks.
          */
-        MobSpawnListener.setSearchTime(0);
+        getPlugin().setSearchTime(0);
 
         /*
         Spawn the new entity in.
@@ -321,7 +327,7 @@ public class StackUtils {
         } else {
             mobStack.setCustomName("");
             mobStack.setCustomNameVisible(true);
-            mobStack.removeMetadata("quantity", MobStacker.plugin);
+            mobStack.removeMetadata("quantity", getPlugin());
         }
 
         /*
@@ -329,7 +335,7 @@ public class StackUtils {
          */
         if (newQuantity > 1) {
 
-            renameStack(mobStack, newQuantity);
+            renameStack(newEntity, newQuantity);
 
             /*
             If it is re-stackable, then attempt to try stack it again.
@@ -342,7 +348,7 @@ public class StackUtils {
         /*
         Set the search time back to normal
          */
-        MobSpawnListener.setSearchTime(MobStacker.plugin.getConfig().getInt("seconds-to-try-stack") * 20);
+        getPlugin().setSearchTime(getPlugin().getConfig().getInt("seconds-to-try-stack") * 20);
 
         /*
         Returns the new stack.
@@ -366,13 +372,13 @@ public class StackUtils {
      * @param existingEntity Second entity
      * @return Bool representing whether attributes are the same.
      */
-    public static boolean mobsHaveSameAttributes(LivingEntity newEntity, LivingEntity existingEntity) {
+    public boolean mobsHaveSameAttributes(LivingEntity newEntity, LivingEntity existingEntity) {
 
-        boolean stackByAge = MobStacker.plugin.getConfig().getBoolean("stack-by-age");
-        boolean stackLeashed = MobStacker.plugin.getConfig().getBoolean("stack-leashed-mobs");
-        boolean protectTamed = MobStacker.plugin.getConfig().getBoolean("protect-tamed");
-        boolean separateColour = MobStacker.plugin.getConfig().getBoolean("separate-stacks-by-color");
-        boolean separateSheared = MobStacker.plugin.getConfig().getBoolean("separate-by-sheared");
+        boolean stackByAge = getPlugin().getConfig().getBoolean("stack-by-age");
+        boolean stackLeashed = getPlugin().getConfig().getBoolean("stack-leashed-mobs");
+        boolean protectTamed = getPlugin().getConfig().getBoolean("protect-tamed");
+        boolean separateColour = getPlugin().getConfig().getBoolean("separate-stacks-by-color");
+        boolean separateSheared = getPlugin().getConfig().getBoolean("separate-by-sheared");
 
         return newEntity.getType() == existingEntity.getType() && !existingEntity.isDead() && !newEntity.isDead() && newEntity.hasMetadata("quantity") &&
                 (stackLeashed || !existingEntity.isLeashed() && !newEntity.isLeashed()) &&
@@ -401,18 +407,18 @@ public class StackUtils {
     /*
     Sets a stack size in metadata
      */
-    public static void setStackSize(LivingEntity entity, int newQuantity) {
-        entity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, newQuantity));
+    public void setStackSize(LivingEntity entity, int newQuantity) {
+        entity.setMetadata("quantity", new FixedMetadataValue(getPlugin(), newQuantity));
     }
 
     /*
     Renames a new stack and removes and old one. Useful method for when two mobs are merging.
      */
-    public static void renameAndRemove(LivingEntity existingEntity, LivingEntity newEntity, int newQuantity, boolean maxStack) {
+    public void renameAndRemove(LivingEntity existingEntity, LivingEntity newEntity, int newQuantity, boolean maxStack) {
 
-        existingEntity.setMetadata("quantity", new FixedMetadataValue(MobStacker.plugin, newQuantity));
-        existingEntity.setMetadata("max-stack", new FixedMetadataValue(MobStacker.plugin, maxStack));
-        String configNaming = MobStacker.plugin.getConfig().getString("stack-naming");
+        existingEntity.setMetadata("quantity", new FixedMetadataValue(getPlugin(), newQuantity));
+        existingEntity.setMetadata("max-stack", new FixedMetadataValue(getPlugin(), maxStack));
+        String configNaming = getPlugin().getConfig().getString("stack-naming");
         configNaming = configNaming.replace("{QTY}", newQuantity + "");
         configNaming = configNaming.replace("{TYPE}", existingEntity.getType().toString().replace("_", " "));
         configNaming = ChatColor.translateAlternateColorCodes('&', configNaming);
@@ -426,9 +432,9 @@ public class StackUtils {
     /*
     Sets the mobs custom name based on definitions in config.
      */
-    public static void renameStack(LivingEntity stack, int newQuantity) {
+    public void renameStack(LivingEntity stack, int newQuantity) {
 
-        String configNaming = MobStacker.plugin.getConfig().getString("stack-naming");
+        String configNaming = getPlugin().getConfig().getString("stack-naming");
         configNaming = configNaming.replace("{QTY}", newQuantity + "");
         configNaming = configNaming.replace("{TYPE}", stack.getType().toString().replace("_", " "));
         configNaming = ChatColor.translateAlternateColorCodes('&', configNaming);
@@ -440,7 +446,7 @@ public class StackUtils {
     /*
     If the stack is, or has been a max stack this will return true.
      */
-    public static boolean isMaxStack(LivingEntity entity) {
+    public boolean isMaxStack(LivingEntity entity) {
 
         if (entity.hasMetadata("max-stack")) {
             return entity.getMetadata("max-stack").get(0).asBoolean();
@@ -450,8 +456,12 @@ public class StackUtils {
 
     }
 
-    public static void setMaxStack(LivingEntity entity, boolean isMaxStack) {
-        entity.setMetadata("max-stack", new FixedMetadataValue(MobStacker.plugin, isMaxStack));
+    public void setMaxStack(LivingEntity entity, boolean isMaxStack) {
+        entity.setMetadata("max-stack", new FixedMetadataValue(getPlugin(), isMaxStack));
+    }
+
+    public MobStacker getPlugin() {
+        return this.plugin;
     }
 
 }

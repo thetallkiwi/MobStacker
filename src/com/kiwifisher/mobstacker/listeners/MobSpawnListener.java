@@ -13,12 +13,11 @@ import java.util.List;
 
 public class MobSpawnListener implements Listener {
 
-    private static int searchTime = MobStacker.plugin.getConfig().getInt("seconds-to-try-stack") * 20;
-    public static int getSearchTime() {
-        return searchTime;
-    }
-    public static void setSearchTime(int searchTime) {
-        MobSpawnListener.searchTime = searchTime;
+
+    private MobStacker plugin;
+
+    public MobSpawnListener(MobStacker plugin) {
+        this.plugin = plugin;
     }
 
     @EventHandler
@@ -45,13 +44,13 @@ public class MobSpawnListener implements Listener {
         /*
         If we're using world guard, check if the mob is in a region. If mob isn't allowed ot stack there, stop here. Don't check armour stands.
          */
-        if (MobStacker.usesWorldGuard() && !entityIsArmorStand) {
+        if (getPlugin().usesWorldGuard() && !entityIsArmorStand) {
 
-            RegionManager regionManager = MobStacker.getWorldGuard().getRegionManager(event.getEntity().getWorld());
+            RegionManager regionManager = getPlugin().getWorldGuard().getRegionManager(event.getEntity().getWorld());
 
             for (ProtectedRegion region : regionManager.getApplicableRegions(event.getEntity().getLocation()).getRegions()) {
 
-                if (!MobStacker.regionAllowedToStack(region.getId())) {
+                if (!getPlugin().regionAllowedToStack(region.getId())) {
                     return;
                 }
             }
@@ -61,35 +60,37 @@ public class MobSpawnListener implements Listener {
         /*
         If the mob is in a valid region, or WG isn't enabled, and we have mobs stacking, then...
          */
-        if (MobStacker.isStacking()) {
+        if (getPlugin().isStacking()) {
 
             /*
             Check that this mob is allowed to stack and that it isn't dead for some reason.
              */
-            if (MobStacker.plugin.getConfig().getBoolean("stack-mob-type." + spawnedCreature.getType().toString())
-                    && MobStacker.plugin.getConfig().getBoolean("stack-spawn-method." + spawnReason) && !entityIsArmorStand && !spawnedCreature.isDead()) {
+            if (getPlugin().getConfig().getBoolean("stack-mob-type." + spawnedCreature.getType().toString())
+                    && getPlugin().getConfig().getBoolean("stack-spawn-method." + spawnReason) && !entityIsArmorStand && !spawnedCreature.isDead()) {
 
                 /*
                 Set stack size to 1 and max stack to false;
                  */
-                StackUtils.setStackSize(spawnedCreature, 1);
-                StackUtils.setMaxStack(spawnedCreature, false);
+                getPlugin().getStackUtils().setStackSize(spawnedCreature, 1);
+                getPlugin().getStackUtils().setMaxStack(spawnedCreature, false);
 
                 /*
                 Check for black listed worlds.
                  */
-                List<String> worldBlackList = MobStacker.plugin.getConfig().getStringList("blacklist-world");
+                List<String> worldBlackList = getPlugin().getConfig().getStringList("blacklist-world");
 
                 /*
                 Make sure search time is positive and that the mob isn't in a blacklisted world, then try to stack it.
                  */
-                if (getSearchTime() > 0 && !worldBlackList.contains(spawnedCreature.getWorld().getName().toLowerCase())) {
-                    StackUtils.attemptToStack(getSearchTime(), spawnedCreature, spawnReason);
+                if (getPlugin().getSearchTime() > 0 && !worldBlackList.contains(spawnedCreature.getWorld().getName().toLowerCase())) {
+                    getPlugin().getStackUtils().attemptToStack(getPlugin().getSearchTime(), spawnedCreature, spawnReason);
                 }
 
             }
         }
     }
 
-
+    public MobStacker getPlugin() {
+        return plugin;
+    }
 }
