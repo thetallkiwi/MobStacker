@@ -23,6 +23,7 @@ public enum AlgorithmEnum {
     SNOW_GOLEM (new SnowGolemLootAlgorithm()),
     SPIDER (new SpiderLootAlgorithm()),
     SQUID (new SquidLootAlgorithm()),
+    GUARDIAN (new GuardianLootAlgorithm()),
     ZOMBIE (new ZombieLootAlgorithm());
 
 

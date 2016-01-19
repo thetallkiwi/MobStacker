@@ -37,7 +37,7 @@ public class StackUtils {
                 /*
                 If search time is > 0, then this block is run, incrementing count.
                  */
-                if (count <= limit) {
+                if (count <= limit && searchTime > 0) {
 
                     count++;
 
@@ -118,9 +118,9 @@ public class StackUtils {
                     cancel();
 
                     /*
-                    If search time is -20, that means in the config search time was set to -1, meaning continuous search mode.
+                    If search time is less than 0, that means in the config search time was set to -1, or lower, meaning continuous search mode.
                      */
-                } else if(searchTime == -20) {
+                } else if(searchTime < 0) {
 
                     /*
                     The flop boolean was implemented so that the attempts to stack happen every second, rather than every half second. This is just because
@@ -134,6 +134,8 @@ public class StackUtils {
                         List<Entity> nearbyEntities = entity.getNearbyEntities(getPlugin().getConfig().getInt("stack-range.x"), getPlugin().getConfig().getInt("stack-range.y"), getPlugin().getConfig().getInt("stack-range.z"));
 
                         for (Entity nearbyEntity : nearbyEntities) {
+
+                            int goAwayIntelliJ = 0;
 
                             int maxStackSize = 0;
 
@@ -198,7 +200,7 @@ public class StackUtils {
         Various checks to make sure the mob is allowed to stack.
          */
         if (newEntity.getType() == existingEntity.getType() && mobAllowedToStack && spawnReasonAllowedToStack && hasRequiredData(newEntity) && hasRequiredData(existingEntity)
-                && !existingEntity.isDead() && !newEntity.isDead()) {
+                && !existingEntity.isDead() && !newEntity.isDead() && existingEntity != newEntity) {
 
             /*
             If the entity was previously a max stack then it can't be stacked to.
@@ -270,6 +272,8 @@ public class StackUtils {
 
         return false;
     }
+
+
 
     /**
      * This method takes a stack and peels one off, spawning in a new mob in the same location.

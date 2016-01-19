@@ -99,7 +99,7 @@ public class MobDeathListener implements Listener {
                     If it's a max stack, then don't try stack to anything around it.
                      */
                     if (maxStack) {
-                        getPlugin().setSearchTime(-1);
+                        getPlugin().setSearchTime(-50);
                     }
 
                     /*

@@ -1,7 +1,6 @@
 package com.kiwifisher.mobstacker.listeners;
 
 import com.kiwifisher.mobstacker.MobStacker;
-import com.kiwifisher.mobstacker.utils.StackUtils;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
@@ -82,7 +81,7 @@ public class MobSpawnListener implements Listener {
                 /*
                 Make sure search time is positive and that the mob isn't in a blacklisted world, then try to stack it.
                  */
-                if (getPlugin().getSearchTime() > 0 && !worldBlackList.contains(spawnedCreature.getWorld().getName().toLowerCase())) {
+                if (getPlugin().getSearchTime() >= -20 && !worldBlackList.contains(spawnedCreature.getWorld().getName().toLowerCase())) {
                     getPlugin().getStackUtils().attemptToStack(getPlugin().getSearchTime(), spawnedCreature, spawnReason);
                 }
 
