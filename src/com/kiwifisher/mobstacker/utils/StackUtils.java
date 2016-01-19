@@ -1,14 +1,13 @@
 package com.kiwifisher.mobstacker.utils;
 
 import com.kiwifisher.mobstacker.MobStacker;
-import com.kiwifisher.mobstacker.listeners.MobSpawnListener;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.material.Colorable;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import java.util.List;
 
@@ -398,14 +397,11 @@ public class StackUtils {
      * @return Returns number of mobs.
      */
     public static int getStackSize(LivingEntity livingEntity) {
-        try {
-            return livingEntity.getMetadata("quantity").get(0).asInt();
-        } catch (NullPointerException e) {
-            e.printStackTrace();
+        List<MetadataValue> list = livingEntity.getMetadata("quantity");
+        if (list.isEmpty()) {
+            return 0;
         }
-
-        return 0;
-
+        return list.get(0).asInt();
     }
 
     /*
