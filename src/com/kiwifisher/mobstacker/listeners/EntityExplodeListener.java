@@ -2,17 +2,14 @@ package com.kiwifisher.mobstacker.listeners;
 
 import com.kiwifisher.mobstacker.MobStacker;
 import com.kiwifisher.mobstacker.utils.StackUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Ageable;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 
 public class EntityExplodeListener implements Listener {
 
-    private MobStacker plugin;
+    private final MobStacker plugin;
 
     public EntityExplodeListener(MobStacker plugin) {
         this.plugin = plugin;
@@ -22,45 +19,45 @@ public class EntityExplodeListener implements Listener {
     public void entityExplodeListener(EntityExplodeEvent event) {
 
         /*
+        Quick return conditions: Entity is not a LivingEntity or is not stacked.
+        */
+        if (!(event.getEntity() instanceof LivingEntity) || !StackUtils.hasRequiredData(event.getEntity())) {
+            return;
+        }
+
+        LivingEntity entity = ((LivingEntity) event.getEntity());
+
+        /*
         If there is a LivingEntity exploding and we have kill full stack set to false, then execute this block.
          */
-        if (event.getEntity() instanceof LivingEntity && !getPlugin().getConfig().getBoolean("exploding-creeper-kills-stack")) {
-
-            LivingEntity entity = ((LivingEntity) event.getEntity());
+        if (!getPlugin().getConfig().getBoolean("exploding-creeper-kills-stack")) {
 
             /*
-            Get the quantity of mobs in the stack.
+            Removes one for the chap that just blew up.
              */
-            if (entity.hasMetadata("quantity")) {
+            int newQuantity = StackUtils.getStackSize(entity) - 1;
+
+            /*
+            If a stack still remains then follow.
+             */
+            if (newQuantity > 0) {
 
                 /*
-                Removes one for the chap that just blew up.
+                Spawn in a new entity to replace the old stack.
                  */
-                int newQuantity = StackUtils.getStackSize(entity) - 1;
+                LivingEntity newEntity = (LivingEntity) entity.getLocation().getWorld().spawnEntity(entity.getLocation(), entity.getType());
 
                 /*
-                If a stack still remains then follow.
+                Set the stacks new size.
                  */
-                if (newQuantity > 0) {
+                getPlugin().getStackUtils().setStackSize(newEntity, newQuantity);
 
-                    /*
-                    Spawn in a new entity to replace the old stack.
-                     */
-                    LivingEntity newEntity = (LivingEntity) entity.getLocation().getWorld().spawnEntity(entity.getLocation(), entity.getType());
+                /*
+                If a stack is larger than one, then give it the appropriate name.
+                 */
+                if (newQuantity > 1) {
 
-                    /*
-                    Set the stacks new size.
-                     */
-                    getPlugin().getStackUtils().setStackSize(newEntity, newQuantity);
-
-                    /*
-                    If a stack is larger than one, then give it the appropriate name.
-                     */
-                    if (newQuantity > 1) {
-
-                        getPlugin().getStackUtils().renameStack(newEntity, newQuantity);
-
-                    }
+                    getPlugin().getStackUtils().renameStack(newEntity, newQuantity);
 
                 }
 
@@ -69,16 +66,10 @@ public class EntityExplodeListener implements Listener {
             /*
             If config is set to kill the full stack AND amplify explosions, then follow.
              */
-        } else if (event.getEntity() instanceof LivingEntity && getPlugin().getConfig().getBoolean("exploding-creeper-kills-stack") &&
-                getPlugin().getConfig().getBoolean("magnify-stack-explosion.enable")) {
+        } else if (getPlugin().getConfig().getBoolean("magnify-stack-explosion.enable")) {
 
             /*
-            Get the bastard exploding.
-             */
-            LivingEntity entity = ((LivingEntity) event.getEntity());
-
-            /*
-            And how many of them there is
+            Get how many entities are exploding
              */
             int quantity = StackUtils.getStackSize(entity);
 
