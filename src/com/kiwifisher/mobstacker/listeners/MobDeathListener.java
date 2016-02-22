@@ -42,20 +42,20 @@ public class MobDeathListener implements Listener {
             if (StackUtils.hasRequiredData(entity)) {
 
                 /*
+                The list of reasons that will kill the whole stack.
+                 */
+                List<String> validDeathReasons = getPlugin().getConfig().getStringList("kill-whole-stack-on-death.reasons");
+
+                /*
                 If the stack fell to it's death, and we are killing the full stack on death my fall damage, follow.
                  */
-                if (event.getEntity().getLastDamageCause() != null && getPlugin().getConfig().getBoolean("kill-whole-stack-on-death.enable")) {
+                if (event.getEntity().getLastDamageCause() != null && getPlugin().getConfig().getBoolean("kill-whole-stack-on-death.enable") && validDeathReasons.contains(event.getEntity().getLastDamageCause().getCause().name())) {
                     int quantity = StackUtils.getStackSize(entity);
-
-                    /*
-                    The list of reasons that will kill the whole stack.
-                     */
-                    List<String> validDeathReasons = getPlugin().getConfig().getStringList("kill-whole-stack-on-death.reasons");
 
                     /*
                     If we are dropping proportionate loot, then follow.
                      */
-                    if (getPlugin().getConfig().getBoolean("kill-whole-stack-on-death.multiply-loot") && quantity > 1 && validDeathReasons.contains(event.getEntity().getLastDamageCause().getCause().name())) {
+                    if (getPlugin().getConfig().getBoolean("kill-whole-stack-on-death.multiply-loot") && quantity > 1) {
 
                             /*
                             Try to drop the proportionate loot.
@@ -82,7 +82,7 @@ public class MobDeathListener implements Listener {
                 }
 
                 /*
-                If the mob has died any way other than fall damage, then follow.
+                If the mob has died any way other than a listed damage, then follow.
                  */
                 int newQuantity = StackUtils.getStackSize(entity) - 1;
 

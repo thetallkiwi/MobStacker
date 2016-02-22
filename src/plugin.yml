@@ -1,7 +1,7 @@
 name: MobStacker
 main: com.kiwifisher.mobstacker.MobStacker
 author: KiwiFisher
-version: 1.8.3
+version: 1.9
 softdepend: [WorldGuard]
 commands:
   mobstacker:

@@ -1,6 +1,7 @@
 package com.kiwifisher.mobstacker.utils;
 
 import com.kiwifisher.mobstacker.MobStacker;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -288,6 +289,7 @@ public class StackUtils {
         Location location = mobStack.getLocation();
         EntityType type = mobStack.getType();
         int newQuantity = mobStack.getMetadata("quantity").get(0).asInt() - 1;
+        Bukkit.broadcastMessage(newQuantity + "");
 
         /*
         Set the search time. If this doesn't happen, shit breaks.
