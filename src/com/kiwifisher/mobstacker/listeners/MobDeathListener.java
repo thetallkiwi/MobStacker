@@ -3,6 +3,7 @@ package com.kiwifisher.mobstacker.listeners;
 import com.kiwifisher.mobstacker.MobStacker;
 import com.kiwifisher.mobstacker.algorithms.AlgorithmEnum;
 import com.kiwifisher.mobstacker.utils.StackUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -10,6 +11,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.material.Colorable;
+import org.bukkit.metadata.FixedMetadataValue;
+
+import java.util.List;
 
 public class MobDeathListener implements Listener {
 
@@ -40,13 +44,18 @@ public class MobDeathListener implements Listener {
                 /*
                 If the stack fell to it's death, and we are killing the full stack on death my fall damage, follow.
                  */
-                if (event.getEntity().getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FALL && getPlugin().getConfig().getBoolean("kill-whole-stack-on-fall-death.enable")) {
+                if (event.getEntity().getLastDamageCause() != null && getPlugin().getConfig().getBoolean("kill-whole-stack-on-death.enable")) {
                     int quantity = StackUtils.getStackSize(entity);
+
+                    /*
+                    The list of reasons that will kill the whole stack.
+                     */
+                    List<String> validDeathReasons = getPlugin().getConfig().getStringList("kill-whole-stack-on-death.reasons");
 
                     /*
                     If we are dropping proportionate loot, then follow.
                      */
-                    if (getPlugin().getConfig().getBoolean("kill-whole-stack-on-fall-death.multiply-loot") && quantity > 1) {
+                    if (getPlugin().getConfig().getBoolean("kill-whole-stack-on-death.multiply-loot") && quantity > 1 && validDeathReasons.contains(event.getEntity().getLastDamageCause().getCause().name())) {
 
                             /*
                             Try to drop the proportionate loot.
@@ -106,6 +115,19 @@ public class MobDeathListener implements Listener {
                     Spawn in a replacement entity.
                      */
                     LivingEntity newEntity = (LivingEntity) entity.getLocation().getWorld().spawnEntity(entityLocation, entityType);
+
+                    /*
+                    Spawn method continuity for whole stack.
+                     */
+                    if (entity.hasMetadata("spawn-reason")) {
+
+                        String oldSpawnReason = entity.getMetadata("spawn-reason").get(0).asString();
+
+                        newEntity.removeMetadata("spawn-reason", getPlugin());
+
+                        newEntity.setMetadata("spawn-reason", new FixedMetadataValue(getPlugin(), oldSpawnReason));
+
+                    }
 
                     /*
                     If the entity was in fire, or burning, then any remaining ticks left on the previous mob will be passed on to the new one.

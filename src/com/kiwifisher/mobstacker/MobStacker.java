@@ -3,6 +3,7 @@ package com.kiwifisher.mobstacker;
 import com.google.common.io.ByteStreams;
 import com.kiwifisher.mobstacker.commands.MobStackerCommands;
 import com.kiwifisher.mobstacker.listeners.*;
+import com.kiwifisher.mobstacker.listeners.EntityTrackListener;
 import com.kiwifisher.mobstacker.utils.StackUtils;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.Bukkit;
@@ -57,6 +58,7 @@ public class MobStacker extends JavaPlugin {
             updateExcludedRegions();
         }
 
+        this.getServer().getPluginManager().registerEvents(new EntityTrackListener(this), this);
         this.getServer().getPluginManager().registerEvents(new MobSpawnListener(this), this);
         this.getServer().getPluginManager().registerEvents(new MobDeathListener(this), this);
         this.getServer().getPluginManager().registerEvents(new PlayerRenameEntityListener(this), this);
@@ -103,7 +105,10 @@ public class MobStacker extends JavaPlugin {
                     ByteStreams.copy(in, out);
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return resourceFile;
     }
 

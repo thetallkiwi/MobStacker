@@ -8,6 +8,8 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.metadata.FixedMetadataValue;
+
 import java.util.List;
 
 public class MobSpawnListener implements Listener {
@@ -77,6 +79,16 @@ public class MobSpawnListener implements Listener {
                 Check for black listed worlds.
                  */
                 List<String> worldBlackList = getPlugin().getConfig().getStringList("blacklist-world");
+
+                /*
+                Check if the mob is from a spawner, and add the tag so that when it dies we can have continuity for
+                nerf-spawner-mobs
+                 */
+                if (!spawnedCreature.hasMetadata("spawn-reason")) {
+
+                    spawnedCreature.setMetadata("spawn-reason", new FixedMetadataValue(getPlugin(), spawnReason));
+
+                }
 
                 /*
                 Make sure search time is positive and that the mob isn't in a blacklisted world, then try to stack it.

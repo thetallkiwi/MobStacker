@@ -25,9 +25,11 @@ stack-leashed-aminals: false
 protect-tamed: true
 
 # If a stack of mobs fall off should the full stack die, or just one mob in the stack?
-kill-whole-stack-on-fall-death:
+kill-whole-stack-on-death:
     enable: true
     multiply-loot: true
+    reasons:
+      - FALL
 
 # If a creeper stack explodes, should the whole stack die?
 exploding-creeper-kills-stack: false
@@ -67,6 +69,10 @@ max-stack-sizes:
 # List worlds that no mobs will ever stack in. Write ALL world names in ONLY lower case.
 blacklist-world:
     - example-world
+
+# For which spawn methods should mobs be nerfed?
+mob-nerfing:
+    - SPAWNER
 
 # Mobs marked with true WILL attempt to stack. Mobs spawned by building (Golems and Wither) are a bit buggy, so it is suggested to leave them false.
 stack-mob-type:
