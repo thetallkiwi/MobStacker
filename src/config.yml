@@ -25,6 +25,7 @@ stack-leashed-aminals: false
 protect-tamed: true
 
 # If a stack of mobs fall off should the full stack die, or just one mob in the stack?
+# All damage causes can be found at https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
 kill-whole-stack-on-death:
     enable: true
     multiply-loot: true
@@ -130,3 +131,4 @@ stack-spawn-method:
     NATURAL: false
     OCELOT_BABY: false
     SLIME_SPLIT: false
+    NETHER_PORTAL: true

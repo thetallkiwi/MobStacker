@@ -24,6 +24,11 @@ public class CaveSpiderLootAlgorithm implements LootAlgorithm {
         return this.dropArrayList;
     }
 
+    @Override
+    public int getExp() {
+        return 0;
+    }
+
     /**
      * Get random loot results for specified number of mobs.
      * @param numberOfMobsWorth number of mobs to get loot for.

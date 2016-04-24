@@ -46,7 +46,7 @@ public class PlayerRenameEntityListener implements Listener {
                 /*
                 If there is more than one creature in the stack, then peel one off and don't allow it to stack again.
                  */
-                if (StackUtils.getStackSize(entity) > 1) { getPlugin().getStackUtils().peelOff(entity, false); }
+                if (StackUtils.getStackSize(entity) > 1) { getPlugin().getStackUtils().peelOffStack(entity, false); }
 
             }
 

@@ -22,6 +22,11 @@ public class BlazeLootAlgorithm implements LootAlgorithm {
         return this.dropArrayList;
     }
 
+    @Override
+    public int getExp() {
+        return 10;
+    }
+
     /**
      * Get random loot results for specified number of mobs.
      * @param numberOfMobsWorth number of mobs to get loot for.
@@ -58,4 +63,6 @@ public class BlazeLootAlgorithm implements LootAlgorithm {
 
         return drops;
     }
+
+
 }

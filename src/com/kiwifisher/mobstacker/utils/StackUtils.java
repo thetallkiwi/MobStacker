@@ -273,15 +273,13 @@ public class StackUtils {
         return false;
     }
 
-
-
     /**
      * This method takes a stack and peels one off, spawning in a new mob in the same location.
      * @param mobStack The stack to peel off of.
      * @param restackable Should the mob that has peeled off be allowed to stack again?
      * @return Returns the new stack.
      */
-    public LivingEntity peelOff(LivingEntity mobStack, boolean restackable) {
+    public LivingEntity peelOffStack(LivingEntity mobStack, boolean restackable) {
 
         /*
         Collecting information on the mob.
@@ -289,7 +287,6 @@ public class StackUtils {
         Location location = mobStack.getLocation();
         EntityType type = mobStack.getType();
         int newQuantity = mobStack.getMetadata("quantity").get(0).asInt() - 1;
-        Bukkit.broadcastMessage(newQuantity + "");
 
         /*
         Set the search time. If this doesn't happen, shit breaks.
@@ -347,6 +344,86 @@ public class StackUtils {
              */
             if (restackable) {
                 attemptToStack(0, (mobStack), CreatureSpawnEvent.SpawnReason.CUSTOM);
+            }
+        }
+
+        /*
+        Set the search time back to normal
+         */
+        getPlugin().setSearchTime(getPlugin().getConfig().getInt("seconds-to-try-stack") * 20);
+
+        /*
+        Returns the new stack.
+         */
+        return newEntity;
+
+    }
+
+    public LivingEntity peelOffSingle(LivingEntity mobStack, boolean restackable) {
+
+        /*
+        Collecting information on the mob.
+         */
+        Location location = mobStack.getLocation();
+        EntityType type = mobStack.getType();
+        int newQuantity = mobStack.getMetadata("quantity").get(0).asInt() - 1;
+
+        /*
+        Set the search time. If this doesn't happen, shit breaks.
+         */
+        getPlugin().setSearchTime(0);
+
+        /*
+        Spawn the new entity in.
+         */
+        LivingEntity newEntity = (LivingEntity) location.getWorld().spawnEntity(location, type);
+
+        /*
+        If the mob has an age, colour, or is a sheep, then set the new mob to have the same attributes as the one it came from.
+         */
+        if (mobStack instanceof Ageable) {
+            ((Ageable) newEntity).setAge(((Ageable) mobStack).getAge());
+        }
+
+        if (mobStack instanceof Colorable) {
+            ((Colorable) newEntity).setColor(((Colorable) mobStack).getColor());
+        }
+
+        if (mobStack instanceof Sheep) {
+            ((Sheep) newEntity).setSheared(((Sheep) mobStack).isSheared());
+        }
+
+        /*
+        The the new stack size, being one less than the existing as one has been peeled off.
+         */
+        setStackSize(mobStack, newQuantity);
+
+        /*
+        If the mob is restackable, then set all its meta.
+         */
+        if (restackable) {
+            setStackSize(newEntity, 1);
+            newEntity.setCustomName("");
+            newEntity.setCustomNameVisible(true);
+
+        } else {
+            newEntity.setCustomName("");
+            newEntity.setCustomNameVisible(true);
+            newEntity.removeMetadata("quantity", getPlugin());
+        }
+
+        /*
+        If there is still a stack remaining, then follow.
+         */
+        if (newQuantity > 1) {
+
+            renameStack(mobStack, newQuantity);
+
+            /*
+            If it is re-stackable, then attempt to try stack it again.
+             */
+            if (restackable) {
+                attemptToStack(0, (newEntity), CreatureSpawnEvent.SpawnReason.CUSTOM);
             }
         }
 

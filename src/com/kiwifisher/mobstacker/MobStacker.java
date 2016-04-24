@@ -23,6 +23,7 @@ public class MobStacker extends JavaPlugin {
     private ArrayList<String> regionsArray = new ArrayList<>();
     private int searchTime = getConfig().getInt("seconds-to-try-stack") * 20;
     private StackUtils stackUtils;
+    private boolean mcMMO = false;
 
     final String uid = "%%__USER__%%";
     final String rid = "%%__RESOURCE__%%";
@@ -44,6 +45,12 @@ public class MobStacker extends JavaPlugin {
             log("Connected to metrics");
         } catch (IOException e) {
             log("Failed to send Metrics data");
+        }
+
+        this.mcMMO = getServer().getPluginManager().isPluginEnabled("mcMMO");
+
+        if (usesmcMMO()) {
+            log("Hooked in to mcMMO successfully!");
         }
 
         worldGuard = initialiseWorldGuard();
@@ -89,6 +96,18 @@ public class MobStacker extends JavaPlugin {
         }
 
         log("Thanks for using MobStacker!");
+
+    }
+
+    public void removeAllStacks() {
+
+        for (World world : getServer().getWorlds()) {
+            for (LivingEntity entity : world.getLivingEntities()) {
+                if (StackUtils.hasRequiredData(entity)) {
+                    entity.remove();
+                }
+            }
+        }
 
     }
 
@@ -180,4 +199,6 @@ public class MobStacker extends JavaPlugin {
     public StackUtils getStackUtils() {
         return stackUtils;
     }
+
+    public boolean usesmcMMO() { return this.mcMMO; }
 }

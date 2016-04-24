@@ -29,12 +29,16 @@ public enum AlgorithmEnum {
 
     private LootAlgorithm lootAlgorithm;
 
+    private int exp;
+
     AlgorithmEnum(LootAlgorithm lootAlgorithm) {
         this.lootAlgorithm = lootAlgorithm;
+        this.exp = lootAlgorithm.getExp();
     }
 
     public LootAlgorithm getLootAlgorithm() {
         return this.lootAlgorithm;
     }
+    public int getExp() { return this.exp; }
 
 }

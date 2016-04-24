@@ -116,6 +116,11 @@ public class MobDeathListener implements Listener {
                      */
                     LivingEntity newEntity = (LivingEntity) entity.getLocation().getWorld().spawnEntity(entityLocation, entityType);
 
+                    if (getPlugin().usesmcMMO()) {
+                        newEntity.setMetadata("mcMMO: Spawned Entity", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("mcMMO"), true));
+
+                    }
+
                     /*
                     Spawn method continuity for whole stack.
                      */

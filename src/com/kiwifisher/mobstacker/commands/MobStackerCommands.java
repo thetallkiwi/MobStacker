@@ -112,6 +112,10 @@ public class MobStackerCommands implements CommandExecutor {
                     player.sendMessage(ChatColor.RED + regionName + ChatColor.YELLOW + " isn't a valid region name");
                 }
 
+            } if (args.length == 1 && args[0].equalsIgnoreCase("clearall") && player.hasPermission("mobstacker.clearall")) {
+
+                getPlugin().removeAllStacks();
+
             } else {
                 player.sendMessage(ChatColor.RED + "Unrecognised command. Please check /mobstacker help");
             }

@@ -19,6 +19,11 @@ public class SpiderLootAlgorithm implements LootAlgorithm {
     }
 
     @Override
+    public int getExp() {
+        return 0;
+    }
+
+    @Override
     public List<Loot> getLootArray() {
         return this.dropArrayList;
     }

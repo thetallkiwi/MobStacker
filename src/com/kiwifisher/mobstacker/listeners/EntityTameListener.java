@@ -43,7 +43,7 @@ public class EntityTameListener implements Listener {
              */
             if (newQuantity > 0) {
 
-                LivingEntity newEntity = getPlugin().getStackUtils().peelOff(entity, false);
+                LivingEntity newEntity = getPlugin().getStackUtils().peelOffStack(entity, false);
 
                 /*
                 If there was an age in question, then assign it.

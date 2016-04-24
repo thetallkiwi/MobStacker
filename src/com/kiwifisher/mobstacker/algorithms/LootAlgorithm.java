@@ -7,8 +7,10 @@ import java.util.List;
 
 public interface LootAlgorithm {
 
-    public abstract List<Loot> getLootArray();
+    public List<Loot> getLootArray();
 
-    public abstract List<ItemStack> getRandomLoot(LivingEntity entity, int numberOfMobsWorth);
+    public int getExp();
+
+    public List<ItemStack> getRandomLoot(LivingEntity entity, int numberOfMobsWorth);
 
 }

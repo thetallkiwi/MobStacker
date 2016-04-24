@@ -23,6 +23,11 @@ public class PigLootAlgorithm implements LootAlgorithm {
         return this.dropArrayList;
     }
 
+    @Override
+    public int getExp() {
+        return new Random().nextInt(3) + 1;
+    }
+
     /**
      * Get random loot results for specified number of mobs.
      * @param numberOfMobsWorth number of mobs to get loot for.

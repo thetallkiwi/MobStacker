@@ -31,7 +31,7 @@ public class PlayerLeashEntityListener implements Listener {
         just jump back in to the stack we got it from.
          */
         if (StackUtils.hasRequiredData(entity) && StackUtils.getStackSize(entity) > 1 && !getPlugin().getConfig().getBoolean("leash-whole-stack")) {
-            getPlugin().getStackUtils().peelOff(entity, false);
+            getPlugin().getStackUtils().peelOffStack(entity, false);
         }
 
     }

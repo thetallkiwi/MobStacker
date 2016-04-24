@@ -34,7 +34,7 @@ public class PlayerShearEntityListener implements Listener {
                 If there's still a stack, peel it off.
                  */
                 if (StackUtils.getStackSize(entity) > 1) {
-                    LivingEntity newEntity = getPlugin().getStackUtils().peelOff(entity, true);
+                    LivingEntity newEntity = getPlugin().getStackUtils().peelOffStack(entity, true);
 
                 } else {
                     /*
