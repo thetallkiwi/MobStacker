@@ -75,6 +75,22 @@ blacklist-world:
 mob-nerfing:
     - SPAWNER
 
+# Should previously stacked mobs be loaded back when chunks load? Note that spawn reason is lost, so options such as mob-nerfing will have no effect.
+load-existing-stacks:
+    enabled: true
+    mob-types:
+        - CHICKEN
+        - COW
+        - HORSE
+        - OCELOT
+        - PIG
+        - RABBIT
+        - SNOWMAN
+        - SHEEP
+        - SQUID
+        - VILLAGER
+        - WOLF
+
 # Mobs marked with true WILL attempt to stack. Mobs spawned by building (Golems and Wither) are a bit buggy, so it is suggested to leave them false.
 stack-mob-type:
     BAT: true

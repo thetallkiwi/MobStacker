@@ -16,6 +16,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,8 +31,16 @@ public class MobSpawnListener implements Listener {
     @EventHandler
     public void mobLoadEvent(ChunkLoadEvent event) {
 
-        // Check if stacking is enabled in this world.
-        if (!isStackable(event.getWorld())) {
+        // Check if loading stacks and stacking is enabled in this world.
+        if (!getPlugin().getConfig().getBoolean("load-existing-stacks.enabled") || !isStackable(event.getWorld())) {
+            return;
+        }
+
+        // Get acceptable mob types
+        List<String> types = getPlugin().getConfig().getStringList("load-existing-stacks.mob-types");
+
+        // Check if any mob types are acceptable
+        if (types.isEmpty()) {
             return;
         }
 
@@ -63,8 +72,8 @@ public class MobSpawnListener implements Listener {
 
         for (Entity entity : event.getChunk().getEntities()) {
 
-            // Check for a custom name. If not found, not an existing stack.
-            if (entity.getCustomName() == null) {
+            // Check for a custom name and an approved type. If not, not an existing stack.
+            if (entity.getCustomName() == null || !types.contains(entity.getType().name())) {
                 continue;
             }
 
@@ -164,8 +173,8 @@ public class MobSpawnListener implements Listener {
      * 
      * @param entity the Entity
      * @param reason the SpawnReason, or null if the chunk is being loaded.
-     * @param worldChecked
-     * @return
+     * @param worldChecked true if the world has already been checked
+     * @return true if the entity can be stacked
      */
     private boolean isStackable(Entity entity, SpawnReason reason, boolean worldChecked) {
 
