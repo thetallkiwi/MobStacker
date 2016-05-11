@@ -1,15 +1,20 @@
 package com.kiwifisher.mobstacker.utils;
 
 import com.kiwifisher.mobstacker.MobStacker;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.material.Colorable;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
 import java.util.List;
 
 /**
@@ -70,6 +75,10 @@ public class StackUtils {
                                  */
                                 if (stackEntities((LivingEntity) nearbyEntity, entity, spawnReason)) {
                                     count = limit + 1;
+                                    if (entity.getType() == EntityType.CHICKEN) {
+                                        Chicken chickenStack = (Chicken) entity;
+                                        chickenStack.launchProjectile(Egg.class, new Vector(1, 1, 1));
+                                    }
                                     cancel();
                                     break;
                                 }
@@ -359,86 +368,6 @@ public class StackUtils {
 
     }
 
-    public LivingEntity peelOffSingle(LivingEntity mobStack, boolean restackable) {
-
-        /*
-        Collecting information on the mob.
-         */
-        Location location = mobStack.getLocation();
-        EntityType type = mobStack.getType();
-        int newQuantity = mobStack.getMetadata("quantity").get(0).asInt() - 1;
-
-        /*
-        Set the search time. If this doesn't happen, shit breaks.
-         */
-        getPlugin().setSearchTime(0);
-
-        /*
-        Spawn the new entity in.
-         */
-        LivingEntity newEntity = (LivingEntity) location.getWorld().spawnEntity(location, type);
-
-        /*
-        If the mob has an age, colour, or is a sheep, then set the new mob to have the same attributes as the one it came from.
-         */
-        if (mobStack instanceof Ageable) {
-            ((Ageable) newEntity).setAge(((Ageable) mobStack).getAge());
-        }
-
-        if (mobStack instanceof Colorable) {
-            ((Colorable) newEntity).setColor(((Colorable) mobStack).getColor());
-        }
-
-        if (mobStack instanceof Sheep) {
-            ((Sheep) newEntity).setSheared(((Sheep) mobStack).isSheared());
-        }
-
-        /*
-        The the new stack size, being one less than the existing as one has been peeled off.
-         */
-        setStackSize(mobStack, newQuantity);
-
-        /*
-        If the mob is restackable, then set all its meta.
-         */
-        if (restackable) {
-            setStackSize(newEntity, 1);
-            newEntity.setCustomName("");
-            newEntity.setCustomNameVisible(true);
-
-        } else {
-            newEntity.setCustomName("");
-            newEntity.setCustomNameVisible(true);
-            newEntity.removeMetadata("quantity", getPlugin());
-        }
-
-        /*
-        If there is still a stack remaining, then follow.
-         */
-        if (newQuantity > 1) {
-
-            renameStack(mobStack, newQuantity);
-
-            /*
-            If it is re-stackable, then attempt to try stack it again.
-             */
-            if (restackable) {
-                attemptToStack(0, (newEntity), CreatureSpawnEvent.SpawnReason.CUSTOM);
-            }
-        }
-
-        /*
-        Set the search time back to normal
-         */
-        getPlugin().setSearchTime(getPlugin().getConfig().getInt("seconds-to-try-stack") * 20);
-
-        /*
-        Returns the new stack.
-         */
-        return newEntity;
-
-    }
-
     /**
      * Returns whether param has required data to try stack
      * @param entity The entity being checked.
@@ -529,6 +458,77 @@ public class StackUtils {
 
         if (entity.hasMetadata("max-stack")) {
             return entity.getMetadata("max-stack").get(0).asBoolean();
+        }
+
+        return true;
+
+    }
+
+    /**
+     * Check if MobStacker is disabled in a world.
+     *
+     * @param world the world to check
+     * @return true if MobStacker is stacking in the World
+     */
+    public boolean isStackable(World world) {
+
+        // Check if stacking is enabled.
+        if (!getPlugin().isStacking()) {
+            return false;
+        }
+
+        // Check if the world is in the blacklist.
+        if (getPlugin().getConfig().getStringList("blacklist-world").contains(world.getName().toLowerCase())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if an Entity can stack.
+     *
+     * @param entity the Entity
+     * @param reason the SpawnReason, or null if the chunk is being loaded.
+     * @param worldChecked true if the world has already been checked
+     * @return true if the entity can be stacked
+     */
+    public boolean isStackable(Entity entity, CreatureSpawnEvent.SpawnReason reason, boolean worldChecked) {
+
+        // Check world if not already checked.
+        if (!worldChecked && !isStackable(entity.getWorld())) {
+            return false;
+        }
+
+        // Ensure we have a living LivingEntity.
+        if (!(entity instanceof LivingEntity) || entity.isDead()) {
+            return false;
+        }
+
+        // No armor stands.
+        if (!Bukkit.getVersion().contains("1.7") && entity.getType() == EntityType.ARMOR_STAND) {
+            return false;
+        }
+
+        // Check if mob type is allowed to stack.
+        if (!getPlugin().getConfig().getBoolean("stack-mob-type." + entity.getType().toString())) {
+            return false;
+        }
+
+        // Check if spawn reason is allowed to cause stacking.
+        if (reason != null && !getPlugin().getConfig().getBoolean("stack-spawn-method." + reason)) {
+            return false;
+        }
+
+        // If we're using WorldGuard, check if the mob is in a region with stacking disabled.
+        if (getPlugin().usesWorldGuard()) {
+            RegionManager regionManager = getPlugin().getWorldGuard().getRegionManager(entity.getWorld());
+
+            for (ProtectedRegion region : regionManager.getApplicableRegions(entity.getLocation()).getRegions()) {
+                if (!getPlugin().regionAllowedToStack(region.getId())) {
+                    return false;
+                }
+            }
         }
 
         return true;

@@ -12,7 +12,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.material.Colorable;
 import org.bukkit.metadata.FixedMetadataValue;
-
 import java.util.List;
 
 public class MobDeathListener implements Listener {
@@ -61,6 +60,19 @@ public class MobDeathListener implements Listener {
                             Try to drop the proportionate loot.
                             */
                         try {
+
+                            /**
+                             * If it's a magma cube and is too small to drop loot then we don't drop anything
+                             */
+                            if (entity.getType() == EntityType.MAGMA_CUBE && ((MagmaCube) entity).getSize() <= 1) {
+                                return;
+                            }
+
+                            if (entity.getType() == EntityType.MAGMA_CUBE && ((MagmaCube) entity).getSize() > 1) {
+                                MagmaCube magmaCube = (MagmaCube) entity;
+                                magmaCube.setSize(1);
+                            }
+
                             event.getDrops().addAll(AlgorithmEnum.valueOf(entity.getType().name()).getLootAlgorithm().getRandomLoot(entity, quantity - 1));
 
                             /*
@@ -116,7 +128,14 @@ public class MobDeathListener implements Listener {
                      */
                     LivingEntity newEntity = (LivingEntity) entity.getLocation().getWorld().spawnEntity(entityLocation, entityType);
 
-                    if (getPlugin().usesmcMMO()) {
+
+                    /**
+                     * Mobs spawned by a blacklisted method will nto give mcmmo points.
+                     */
+                    List<String> noMcmmoSpawnReasons = getPlugin().getConfig().getStringList("no-mcmmo-xp");
+
+                    if (getPlugin().usesmcMMO() && noMcmmoSpawnReasons.contains(entity.getMetadata("spawn-reason").get(0).toString())) {
+
                         newEntity.setMetadata("mcMMO: Spawned Entity", new FixedMetadataValue(Bukkit.getPluginManager().getPlugin("mcMMO"), true));
 
                     }

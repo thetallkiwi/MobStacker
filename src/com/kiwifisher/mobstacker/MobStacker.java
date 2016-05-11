@@ -24,6 +24,7 @@ public class MobStacker extends JavaPlugin {
     private int searchTime = getConfig().getInt("seconds-to-try-stack") * 20;
     private StackUtils stackUtils;
     private boolean mcMMO = false;
+    public final static String RELOAD_UUID = UUID.randomUUID().toString().replaceAll("-", "");
 
     final String uid = "%%__USER__%%";
     final String rid = "%%__RESOURCE__%%";
@@ -36,6 +37,7 @@ public class MobStacker extends JavaPlugin {
 
         log("MobStacker is starting");
         loadResource(this, "config.yml");
+        log(RELOAD_UUID);
 
         this.stackUtils = new StackUtils(this);
 
@@ -75,6 +77,7 @@ public class MobStacker extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new PlayerShearEntityListener(this), this);
         this.getServer().getPluginManager().registerEvents(new SheepDyeListener(this), this);
         this.getServer().getPluginManager().registerEvents(new SheepRegrowWoolListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new ChunkChangeListener(this), this);
 
         getCommand("mobstacker").setExecutor(new MobStackerCommands(this));
 
@@ -85,15 +88,15 @@ public class MobStacker extends JavaPlugin {
     @Override
     public void onDisable() {
 
-        for (World world : getServer().getWorlds()) {
-            for (LivingEntity entity : world.getLivingEntities()) {
-                if (entity.hasMetadata("quantity")) {
-                    entity.removeMetadata("quantity", this);
-                    entity.setCustomName("");
-                    entity.setCustomNameVisible(true);
-                }
-            }
-        }
+//        for (World world : getServer().getWorlds()) {
+//            for (LivingEntity entity : world.getLivingEntities()) {
+//                if (entity.hasMetadata("quantity")) {
+//                    entity.removeMetadata("quantity", this);
+//                    entity.setCustomName("");
+//                    entity.setCustomNameVisible(true);
+//                }
+//            }
+//        }
 
         log("Thanks for using MobStacker!");
 
@@ -201,4 +204,5 @@ public class MobStacker extends JavaPlugin {
     }
 
     public boolean usesmcMMO() { return this.mcMMO; }
+
 }

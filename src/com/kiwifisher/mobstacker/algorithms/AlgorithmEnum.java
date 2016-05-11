@@ -24,6 +24,7 @@ public enum AlgorithmEnum {
     SPIDER (new SpiderLootAlgorithm()),
     SQUID (new SquidLootAlgorithm()),
     GUARDIAN (new GuardianLootAlgorithm()),
+    MAGMA_CUBE (new MagmaCubeAlgorithm()),
     ZOMBIE (new ZombieLootAlgorithm());
 
 
