@@ -75,6 +75,11 @@ blacklist-world:
 mob-nerfing:
     - SPAWNER
 
+# Stacks from these spawn methods will not give any mcMMO experience
+no-mcmmo-exp:
+    - SPAWNER
+    - SPAWNER_EGG
+
 # Should previously stacked mobs be loaded back when chunks load? Note that spawn reason is lost, so options such as mob-nerfing will have no effect.
 load-existing-stacks:
     enabled: true
@@ -148,3 +153,5 @@ stack-spawn-method:
     OCELOT_BABY: false
     SLIME_SPLIT: false
     NETHER_PORTAL: true
+
+

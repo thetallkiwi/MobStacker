@@ -132,7 +132,7 @@ public class MobDeathListener implements Listener {
                     /**
                      * Mobs spawned by a blacklisted method will nto give mcmmo points.
                      */
-                    List<String> noMcmmoSpawnReasons = getPlugin().getConfig().getStringList("no-mcmmo-xp");
+                    List<String> noMcmmoSpawnReasons = getPlugin().getConfig().getStringList("no-mcmmo-exp");
 
                     if (getPlugin().usesmcMMO() && noMcmmoSpawnReasons.contains(entity.getMetadata("spawn-reason").get(0).toString())) {
 

@@ -5,9 +5,13 @@ import com.kiwifisher.mobstacker.commands.MobStackerCommands;
 import com.kiwifisher.mobstacker.listeners.*;
 import com.kiwifisher.mobstacker.listeners.EntityTrackListener;
 import com.kiwifisher.mobstacker.utils.StackUtils;
+import com.sk89q.worldedit.util.YAMLConfiguration;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,7 +28,9 @@ public class MobStacker extends JavaPlugin {
     private int searchTime = getConfig().getInt("seconds-to-try-stack") * 20;
     private StackUtils stackUtils;
     private boolean mcMMO = false;
-    public final static String RELOAD_UUID = UUID.randomUUID().toString().replaceAll("-", "");
+    public final static String RELOAD_UUID = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 12);
+    private String LAST_USED_UUID;
+    private YamlConfiguration uuidConfig = new YamlConfiguration();
 
     final String uid = "%%__USER__%%";
     final String rid = "%%__RESOURCE__%%";
@@ -37,9 +43,16 @@ public class MobStacker extends JavaPlugin {
 
         log("MobStacker is starting");
         loadResource(this, "config.yml");
-        log(RELOAD_UUID);
+
+        try {
+            this.uuidConfig.load(loadResource(this, "uuid.yml"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         this.stackUtils = new StackUtils(this);
+
+        this.LAST_USED_UUID = uuidConfig.getString("last-used-UUID");
 
         try {
             Metrics metrics = new Metrics(this);
@@ -81,6 +94,13 @@ public class MobStacker extends JavaPlugin {
 
         getCommand("mobstacker").setExecutor(new MobStackerCommands(this));
 
+        for (World world : getServer().getWorlds()) {
+
+            Entity[] entities = new Entity[world.getEntities().size()];
+            getStackUtils().reviveStacks(world.getEntities().toArray(entities));
+
+        }
+
         log("MobStacker has successfully started!");
 
     }
@@ -88,15 +108,27 @@ public class MobStacker extends JavaPlugin {
     @Override
     public void onDisable() {
 
-//        for (World world : getServer().getWorlds()) {
-//            for (LivingEntity entity : world.getLivingEntities()) {
-//                if (entity.hasMetadata("quantity")) {
-//                    entity.removeMetadata("quantity", this);
-//                    entity.setCustomName("");
-//                    entity.setCustomNameVisible(true);
-//                }
-//            }
-//        }
+        for (World world : getServer().getWorlds()) {
+
+            for (Entity entity : world.getEntities()) {
+
+                if (StackUtils.hasRequiredData(entity)) {
+
+                    int quantity = StackUtils.getStackSize((LivingEntity) entity);
+                    entity.setCustomName(quantity + "-" + MobStacker.RELOAD_UUID + "-" + entity.getMetadata("spawn-reason").get(0).asString());
+
+                }
+
+            }
+
+        }
+
+        this.uuidConfig.set("last-used-UUID", RELOAD_UUID);
+        try {
+            this.uuidConfig.save(getDataFolder().getAbsolutePath() + "/uuid.yml");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         log("Thanks for using MobStacker!");
 
@@ -204,5 +236,9 @@ public class MobStacker extends JavaPlugin {
     }
 
     public boolean usesmcMMO() { return this.mcMMO; }
+
+    public String getLAST_USED_UUID() {
+        return this.LAST_USED_UUID;
+    }
 
 }

@@ -3,10 +3,7 @@ package com.kiwifisher.mobstacker.utils;
 import com.kiwifisher.mobstacker.MobStacker;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.material.Colorable;
@@ -537,6 +534,59 @@ public class StackUtils {
 
     public void setMaxStack(LivingEntity entity, boolean isMaxStack) {
         entity.setMetadata("max-stack", new FixedMetadataValue(getPlugin(), isMaxStack));
+    }
+
+    public void reviveStacks(Entity[] entities) {
+
+        List<String> types = getPlugin().getConfig().getStringList("load-existing-stacks.mob-types");
+
+        for (Entity entity : entities) {
+
+            // Check for a custom name and an approved type. If not, not an existing stack.
+            if (entity.getCustomName() == null) {
+                continue;
+            }
+
+            // Check if the entity can stack.
+            if (!getPlugin().getStackUtils().isStackable(entity, null, true)) {
+                continue;
+            }
+
+
+            getPlugin().log(MobStacker.RELOAD_UUID + " and " + getPlugin().getLAST_USED_UUID());
+            if (!entity.getCustomName().contains(MobStacker.RELOAD_UUID) && !entity.getCustomName().contains(getPlugin().getLAST_USED_UUID())) {
+                continue;
+            }
+
+            // Cast to LivingEntity. This is safe, checked in isStackable.
+            LivingEntity living = (LivingEntity) entity;
+
+            // Parse stack size from matched group (see long comment above for group selection reasoning).
+            String[] attributes = entity.getCustomName().split("-");
+
+            int stackSize;
+
+            try {
+                String quantityString = attributes[0]; //One extra for the hyphen
+                stackSize = Integer.valueOf(quantityString);
+            } catch (NumberFormatException e) {
+                // There should be no way to hit this block given the regex, but it's better safe than sorry.
+                continue;
+            }
+
+            String spawnReason = attributes[2];
+
+            // Get max stack size for type.
+            int maxStackSize = getPlugin().getConfig().getInt(("max-stack-sizes.") + entity.getType().toString(), 0);
+
+            // Set metadata.
+            getPlugin().getStackUtils().setStackSize(living, stackSize);
+            getPlugin().getStackUtils().setMaxStack(living, maxStackSize > 0 && maxStackSize <= stackSize);
+            getPlugin().getStackUtils().renameStack(living, stackSize);
+            entity.setMetadata("spawn-reason", new FixedMetadataValue(getPlugin(), spawnReason));
+
+        }
+
     }
 
     public MobStacker getPlugin() {

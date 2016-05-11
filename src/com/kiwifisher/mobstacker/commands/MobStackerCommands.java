@@ -31,15 +31,19 @@ public class MobStackerCommands implements CommandExecutor {
                         + ChatColor.GRAY + " - True meaning mobs do stack.");}
                 player.sendMessage(ChatColor.GREEN + "Toggle: " + ChatColor.YELLOW + "/mobstacker toggle" + ChatColor.GRAY + " - Toggles whether mobs stack globally");
                 player.sendMessage(ChatColor.GREEN + "Toggle: " + ChatColor.YELLOW + "/mobstacker reload" + ChatColor.GRAY + " - Reloads the config");
+                player.sendMessage(ChatColor.GREEN + "KillAll: " + ChatColor.YELLOW + "/mobstacker killall" + ChatColor.GRAY + " - Removes all stacks in all worlds");
+                return true;
 
             } else if (args.length == 1 && args[0].equalsIgnoreCase("reload") && player.hasPermission("mobstacker.reload")) {
                 getPlugin().reloadConfig();
                 player.sendMessage(ChatColor.GREEN + "Reloaded the config for MobStacker");
+                return true;
 
             } else if (args.length == 1 && args[0].equalsIgnoreCase("toggle") && player.hasPermission("mobstacker.toggle")) {
                 getPlugin().setStacking(!getPlugin().isStacking());
 
                 player.sendMessage(ChatColor.GREEN + "Mob stacking is now " + (getPlugin().isStacking() ? ChatColor.GREEN + "enabled" : ChatColor.RED + "disabled"));
+                return true;
 
             } else if (args.length == 3 && args[0].equalsIgnoreCase("region") && player.hasPermission("mobstacker.setregions")
                     && (args[2].equalsIgnoreCase("true") || args[2].equalsIgnoreCase("false"))) {
@@ -112,9 +116,13 @@ public class MobStackerCommands implements CommandExecutor {
                     player.sendMessage(ChatColor.RED + regionName + ChatColor.YELLOW + " isn't a valid region name");
                 }
 
-            } if (args.length == 1 && args[0].equalsIgnoreCase("clearall") && player.hasPermission("mobstacker.clearall")) {
+                return true;
+
+            } if (args.length == 1 && args[0].equalsIgnoreCase("killall") && player.hasPermission("mobstacker.killall")) {
 
                 getPlugin().removeAllStacks();
+                player.sendMessage(ChatColor.GREEN + "All stacks were successfully removed");
+                return true;
 
             } else {
                 player.sendMessage(ChatColor.RED + "Unrecognised command. Please check /mobstacker help");
@@ -125,6 +133,7 @@ public class MobStackerCommands implements CommandExecutor {
             if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
                 getPlugin().reloadConfig();
                 getPlugin().log("Reloaded the config for MobStacker");
+                return true;
 
             }
 
@@ -132,6 +141,7 @@ public class MobStackerCommands implements CommandExecutor {
                 getPlugin().setStacking(!getPlugin().isStacking());
 
                 getPlugin().log("Mob stacking is now " + (getPlugin().isStacking() ? "enabled" : "disabled"));
+                return true;
 
             }
 
